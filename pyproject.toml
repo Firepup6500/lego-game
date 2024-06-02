@@ -8,6 +8,7 @@ packages = [{include = "lego_game"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
+firepup650 = "^1.0.35"
 
 
 [build-system]
