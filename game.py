@@ -1,4 +1,4 @@
-from firepup650 import clear, randint, sql, e
+from firepup650 import clear, randint, sql, e, menu
 import random as r
 from fkeycapture import get, getnum, getchars
 import os, time, sys, re
@@ -23,18 +23,15 @@ print("Starting...")
 clear()
 print("Welcome to the city!")
 print("Do you have an existing account?\n1. Yes\n2. No")
-log = getchars()
+log = menu({"Yes": 1, "No": 0}, "Welcome to the city!\nDo you have an existing account?")
 un = ""
-if log == "1":
-    clear()
-    print("Please enter your 5 character username")
+if log:
     pw = ""
     while 1:
-        un.append(getchars(alphanum))
         clear()
         print("Please enter your 5 character username")
         print(un, end="")
-        match un.length():
+        match len(un):
             case 0:
                 print("-----")
             case 1:
@@ -47,13 +44,13 @@ if log == "1":
                 print("-")
             case _:
                 pass
-        if un.length() == 5:
+        if len(un) == 5:
             break
+        un += getchars(1, alphanum)
     while 1:
-        pw.append(getchars(alphanum))
         clear()
-        print("Please enter your 5 character username")
-        match pw.length():
+        print("Please enter your 5 character password")
+        match len(pw):
             case 0:
                 print("-----")
             case 1:
@@ -66,8 +63,9 @@ if log == "1":
                 print("****-")
             case _:
                 print("*****")
-        if pw.length() == 5:
+        if len(pw) == 5:
             break
+        pw += getchars(1, alphanum)
     uData = db.get(un)
     if not uData:
         print("Sorry, that username is not recognized.")
@@ -83,7 +81,7 @@ else:
         clear()
         print("Please enter a 5 character (alphanumeric) username")
         print(un, end="")
-        match un.length():
+        match len(un):
             case 0:
                 print("-----")
             case 1:
@@ -96,14 +94,13 @@ else:
                 print("-")
             case _:
                 pass
-        if un.length() == 5:
+        if len(un) == 5:
             break
-        un.append(getchars(alphanum))
+        un += getchars(1, alphanum)
     while 1:
         clear()
         print("Please enter a 5 character (alphanumeric) password")
-
-        match pw.length():
+        match len(pw):
             case 0:
                 print("-----")
             case 1:
@@ -116,9 +113,9 @@ else:
                 print("****-")
             case _:
                 print("*****")
-        if pw.length() == 5:
+        if len(pw) == 5:
             break
-        pw.append(getchars(alphanum))
+        pw += getchars(1, alphanum)
     uData = db.get(un)
     if uData:
         print("Sorry, that username is already registered, please log in instead.")
@@ -150,100 +147,135 @@ if uData["logins"] == 1:
     print(f"Welcome {un}, to Loge City!")
 else:
     print(f"Welcome back to Loge City {un}.")
-sleep(1)
+sleep(2)
 while 1:
-    print("""What would you like to do?
-1. Stats
-2. Gamble
-3. Research
-4. Vehicle Shop
-5. Rare Parts Shop
-6. Energy Tank Shop
-7. Resturant
-E. Exit""") # TODO: Put shops in their own menu
-    if uData["debug"]:
-        print("D. [DEBUG]")
-    go = getchars("1234567ED")
+    go = menu({"Stats": 1, "Gamble": 2, "Research": 3, "Vehicle Shop": 4, "Rare Parts Shop": 5, "Energy Tank Shop": 6, "Resturant": 7, "[DEBUG]": "D", "Exit": "E"}, "What would you like to do?") # TODO: Put shops in their own menu
+    clear()
     match go:
-        case "1":
+        case 1:
             print(f"""Stats:
  Studs:
   Current:          {uData["studs"]}
   All-time Highest: {uData["highestStuds"]}
   All-time Losses:  {uData["studsLost"]}
   All-time Gains:   {uData["studsGained"]}
- Vehicles:          {uData["vechicles"]}
+ Vehicles:          {uData["vehicles"]}
  House Level:       {uData["houseLevel"]}
  Energy Tanks:      {uData["energyTanks"]}""")
             if uData["debug"]:
-                print("""Debug Stats:
+                print(f"""Debug Stats:
  Bebug bit:         {uData["debug"]}
  Permission Level:  {uData["permissionLevel"]}
  Idk what o is:     {uData["o"]}""")
             print("Press any key to exit")
             get()
-            clear()
-        case "2":
-            print("""How many studs would you like to bet?
-1. 10
-2. 20
-3. 30
-4. 40
-5. 50
-6. 60
-7. 70
-8. 80
-9. 90
-0. 100
-E. Exit""")
-            bet = getchars("0123456789E")
-            betSt = 0
+        case 2:
+            bet = menu({"5": 5, "10": 10, "20": 20, "30": 30, "40": 40, "50": 50, "60": 60, "70": 70, "80": 80, "90": 90, "100": 100, "1000": 1000, "Exit": "E"}, "How many studs would you like to bet?")
+            betHigh = 0
             match bet:
-                case "1":
-                    betSt = 20
-                case "2":
-                    betSt = 40
-                case "3":
-                    betSt = 60
-                case "4":
-                    betSt = 80
-                case "5":
-                    betSt = 100
-                case "6":
-                    betSt = 120
-                case "7":
-                    betSt = 140
-                case "8":
-                    betSt = 160
-                case "9":
-                    betSt = 180
-                case "0":
-                    betSt = 200
+                case 10:
+                    betHigh = 20
+                case 20:
+                    betHigh = 40
+                case 30:
+                    betHigh = 60
+                case 40:
+                    betHigh = 80
+                case 50:
+                    betHigh = 100
+                case 60:
+                    betHigh = 120
+                case 70:
+                    betHigh = 140
+                case 80:
+                    betHigh = 160
+                case 90:
+                    betHigh = 180
+                case 100:
+                    betHigh = 200
+                case 1000:
+                    betHigh = 2000
                 case _:
-                    betSt = 0
+                    betHigh = 0
             winnings = 0
-            while 1:
-                winnings = randint(0 - max, max)
+            betLow = -bet if betHigh else 0
+            while betHigh:
+                winnings = randint(betLow, betHigh)
                 if multipleOf(winnings):
                     break
-            if betSt:
-                if uData["studs"] >= int(bet) * 10:
+            if betHigh:
+                if uData["studs"] >= abs(betLow):
                     uData["studs"] += winnings
                     # And this is the end of the old code docs... (basically, this part is modified however)
                     if winnings == 0:
                         print("You won nothing. (You kept your bet though)")
-                    elif winnings == (0 - (int(bet) * 10)):
+                    elif winnings == betLow:
                         print("You lost your bet!")
-                        uData["studsLost"] -= winnings
+                        uData["studsLost"] += abs(winnings)
                     elif winnings >= 0:
                         print(f"You won {winnings} studs!")
                         uData["studsGained"] += winnings
                     elif winnings <= 0:
-                        print(f"You lost {winnings} studs!")
-                        uData["studsLost"] -= winnings
+                        print(f"You lost {abs(winnings)} studs!")
+                        uData["studsLost"] += abs(winnings)
                     else:
-                        print("wtf")
-                    if uData["studs"] > uData["highestStuds"]:
-                        uData["highestStuds"] = uData["studs"]
+                        print("This should be impossible. Cue the panic attacks.")
                 else:
                     print("You don't have enough studs to bet that much.")
+                sleep(5)
+        case 3:
+            print("TODO: Research Menu")
+            sleep(1)
+        case 4:
+            print("TODO: Vehicle Shop")
+            sleep(1)
+        case 5:
+            print("TODO: Rare Parts Shop")
+            sleep(1)
+        case 6:
+            print("TODO: Energy Tank Shop")
+            sleep(1)
+        case 7:
+            print("TODO: Resturant")
+            sleep(1)
+        case "E":
+            exit(0)
+        case "D":
+            if uData["debug"]:
+                deb = menu({"Dump User Data": 1, "Reset Studs": 2, "Full data reset": 3, "Exit": "E"}, "[DEBUG MENU]")
+                match deb:
+                    case 1:
+                        print(f"User Data dump: {uData}")
+                    case 2:
+                        uData["studs"] = 20
+                        uData["studsLost"] = 0
+                        uData["studsGained"] = 0
+                        uData["highestStuds"] = 20
+                        print("Studs (and related stats) have been reset.")
+                    case 3:
+                        uData["studs"] = 20
+                        uData["studsLost"] = 0
+                        uData["studsGained"] = 0
+                        uData["highestStuds"] = 20
+                        uData["vehicles"] = {}
+                        uData["energyTanks"] = 0
+                        uData["logins"] = 0
+                        uData["houseLevel"] = 0
+                        uData["o"] = 0
+                        print("User data has been reset.")
+                    case "E":
+                        print("SLEEP 5")
+                    case _:
+                        print("Firepup forgot to implement a debug menu option\nSLEEP 10")
+                        sleep(5)
+                sleep(5)
+            else:
+                print("Operation not permitted")
+                sleep(5)
+        case _:
+            print("Invalid option, this should have been impossible.")
+            sleep(60)
+    clear()
+    if uData["studs"] > uData["highestStuds"]:
+        uData["highestStuds"] = uData["studs"]
+    db.set(un, uData) # Update user data after each loop so it actually saves changes to the data
