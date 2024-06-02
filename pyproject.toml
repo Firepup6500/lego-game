@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "lego-game"
+version = "0.0.1"
+description = "A very old pet project of mine"
+authors = ["Firepup Sixfifty <firepyp650@gmail.com>"]
+readme = "README.md"
+packages = [{include = "lego_game"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
