@@ -232,5 +232,18 @@ E. Exit""")
                     # And this is the end of the old code docs... (basically, this part is modified however)
                     if winnings == 0:
                         print("You won nothing. (You kept your bet though)")
-                    if winnings == (0 - (int(bet) * 10)):
+                    elif winnings == (0 - (int(bet) * 10)):
                         print("You lost your bet!")
+                        uData["studsLost"] -= winnings
+                    elif winnings >= 0:
+                        print(f"You won {winnings} studs!")
+                        uData["studsGained"] += winnings
+                    elif winnings <= 0:
+                        print(f"You lost {winnings} studs!")
+                        uData["studsLost"] -= winnings
+                    else:
+                        print("wtf")
+                    if uData["studs"] > uData["highestStuds"]:
+                        uData["highestStuds"] = uData["studs"]
+                else:
+                    print("You don't have enough studs to bet that much.")
