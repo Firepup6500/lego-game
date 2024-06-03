@@ -1,4 +1,4 @@
-from firepup650 import clear, randint, sql, e, menu
+from firepup650 import clear, randint, sql, e, menu, gp, gh
 import random as r
 from fkeycapture import get, getnum, getchars
 import os, time, sys, re
@@ -6,66 +6,34 @@ from time import sleep
 
 db = sql("dev-database.db")
 
-alphanum = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+alphanum = list("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")
 
 def multipleOf(num: int, mult: int = 5) -> bool:
     return num%mult == 0
 
-# TODO: Add some sleeps to make this seem like it's doing something
 print("Loading Loge City v 0.0.1...")
+sleep(1)
 print("Checking system compatibility...")
-print("OK.")  # TODO: This should beep or something
+sleep(1)
+print("\aOK.")
+sleep(1)
 print("Checking imports...")
 print("import ID UcO80qfR7o2BW3owpAQRsD6Q")
-print("OK.")
+sleep(1)
+print("\aOK.")
+sleep(1)
 print("Loaded successfully")
 print("Starting...")
-clear()
-print("Welcome to the city!")
-print("Do you have an existing account?\n1. Yes\n2. No")
-log = menu({"Yes": 1, "No": 0}, "Welcome to the city!\nDo you have an existing account?")
+sleep(2)
+log = menu({"Yes": 1, "No": 0, "Exit": "E"}, "Welcome to the city!\nDo you have an existing account?")
 un = ""
+if log == "E":
+    exit(0)
 if log:
-    pw = ""
-    while 1:
-        clear()
-        print("Please enter your 5 character username")
-        print(un, end="")
-        match len(un):
-            case 0:
-                print("-----")
-            case 1:
-                print("----")
-            case 2:
-                print("---")
-            case 3:
-                print("--")
-            case 4:
-                print("-")
-            case _:
-                pass
-        if len(un) == 5:
-            break
-        un += getchars(1, alphanum)
-    while 1:
-        clear()
-        print("Please enter your 5 character password")
-        match len(pw):
-            case 0:
-                print("-----")
-            case 1:
-                print("*----")
-            case 2:
-                print("**---")
-            case 3:
-                print("***--")
-            case 4:
-                print("****-")
-            case _:
-                print("*****")
-        if len(pw) == 5:
-            break
-        pw += getchars(1, alphanum)
+    print("Username: ", end="")
+    un = gp(5, alphanum, allowDelete=True)
+    print("Password: ", end="")
+    pw = gh(5, alphanum, allowDelete=True)
     uData = db.get(un)
     if not uData:
         print("Sorry, that username is not recognized.")
@@ -76,46 +44,10 @@ if log:
     else:
         print("Logged in.")
 else:
-    pw = ""
-    while 1:
-        clear()
-        print("Please enter a 5 character (alphanumeric) username")
-        print(un, end="")
-        match len(un):
-            case 0:
-                print("-----")
-            case 1:
-                print("----")
-            case 2:
-                print("---")
-            case 3:
-                print("--")
-            case 4:
-                print("-")
-            case _:
-                pass
-        if len(un) == 5:
-            break
-        un += getchars(1, alphanum)
-    while 1:
-        clear()
-        print("Please enter a 5 character (alphanumeric) password")
-        match len(pw):
-            case 0:
-                print("-----")
-            case 1:
-                print("*----")
-            case 2:
-                print("**---")
-            case 3:
-                print("***--")
-            case 4:
-                print("****-")
-            case _:
-                print("*****")
-        if len(pw) == 5:
-            break
-        pw += getchars(1, alphanum)
+    print("Username (alphanumeric): ", end="")
+    un = gp(5, alphanum, allowDelete=True)
+    print("Password (alphanumeric):", end="")
+    pw = gh(5, alphanum, allowDelete=True)
     uData = db.get(un)
     if uData:
         print("Sorry, that username is already registered, please log in instead.")
