@@ -148,7 +148,11 @@ while 1:
             print("TODO: Rare Parts Shop")
             sleep(1)
         case 6:
-            print("TODO: Energy Tank Shop")
+            price1 = 10 + (5 * uData["energyTanks"])
+            price5 = 5 * price1
+            price10 = 2 * price5
+            count = menu({f"1 ({price1} studs)": 1, "5 ({price5} studs)": 5, "10 ({price10} studs)": 10}, "How many energy tanks do you want?")
+            print("TODO: Energy Tank Shop Functionality")
             sleep(1)
         case 7:
             print("TODO: Resturant")
@@ -160,7 +164,10 @@ while 1:
                 deb = menu({"Dump User Data": 1, "Reset Studs": 2, "Full data reset": 3, "Exit": "E"}, "[DEBUG MENU]")
                 match deb:
                     case 1:
-                        print(f"User Data dump: {uData}")
+                        print("User Data dump: {")
+                        for k in uData:
+                            print(f'    "{k}": {str(uData[k])}')
+                        print("}")
                     case 2:
                         uData["studs"] = 20
                         uData["studsLost"] = 0
