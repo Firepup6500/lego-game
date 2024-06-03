@@ -1,4 +1,4 @@
-from firepup650 import clear, randint, sql, e, menu, gp, gh
+from firepup650 import clear, randint, sql, e, menu, gp, gh, cur, flushPrint
 import random as r
 from fkeycapture import get, getnum, getchars
 import os, time, sys, re
@@ -11,25 +11,29 @@ alphanum = list("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 def multipleOf(num: int, mult: int = 5) -> bool:
     return num%mult == 0
 
+cur.hide()
+clear()
 print("Loading Loge City v 0.0.1...")
 sleep(1)
-print("Checking system compatibility...")
+flushPrint("Checking system compatibility...")
 sleep(1)
-print("\aOK.")
+print(" \aOK.")
 sleep(1)
-print("Checking imports...")
-print("import ID UcO80qfR7o2BW3owpAQRsD6Q")
+flushPrint("Checking data...")
 sleep(1)
-print("\aOK.")
+print(" \aOK.")
 sleep(1)
 print("Loaded successfully")
 print("Starting...")
 sleep(2)
+cur.show()
 log = menu({"Yes": 1, "No": 0, "Exit": "E"}, "Welcome to the city!\nDo you have an existing account?")
+clear()
 un = ""
 if log == "E":
     exit(0)
 if log:
+    print("Login")
     print("Username: ", end="")
     un = gp(5, alphanum, allowDelete=True)
     print("Password: ", end="")
@@ -44,6 +48,7 @@ if log:
     else:
         print("Logged in.")
 else:
+    print("Signup")
     print("Username (alphanumeric): ", end="")
     un = gp(5, alphanum, allowDelete=True)
     print("Password (alphanumeric):", end="")
@@ -105,6 +110,8 @@ while 1:
             bet = menu({"5": 5, "10": 10, "20": 20, "30": 30, "40": 40, "50": 50, "60": 60, "70": 70, "80": 80, "90": 90, "100": 100, "1000": 1000, "Exit": "E"}, "How many studs would you like to bet?")
             betHigh = 0
             match bet:
+                case 5:
+                    betHigh = 10
                 case 10:
                     betHigh = 20
                 case 20:
