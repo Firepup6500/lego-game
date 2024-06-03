@@ -107,35 +107,11 @@ while 1:
             print("Press any key to exit")
             get()
         case 2:
-            bet = menu({"5": 5, "10": 10, "20": 20, "30": 30, "40": 40, "50": 50, "60": 60, "70": 70, "80": 80, "90": 90, "100": 100, "1000": 1000, "Exit": "E"}, "How many studs would you like to bet?")
-            betHigh = 0
-            match bet:
-                case 5:
-                    betHigh = 10
-                case 10:
-                    betHigh = 20
-                case 20:
-                    betHigh = 40
-                case 30:
-                    betHigh = 60
-                case 40:
-                    betHigh = 80
-                case 50:
-                    betHigh = 100
-                case 60:
-                    betHigh = 120
-                case 70:
-                    betHigh = 140
-                case 80:
-                    betHigh = 160
-                case 90:
-                    betHigh = 180
-                case 100:
-                    betHigh = 200
-                case 1000:
-                    betHigh = 2000
-                case _:
-                    betHigh = 0
+            print("Calculating avaliable bets, this shouldn't take long...")
+            bets = {str(i): i for i in range(5, min(uData["studs"], 50000000), 5)}
+            bets["Exit"] = "E"
+            bet = menu(bets, "How many studs would you like to bet?")
+            betHigh = 0 if type(bet) != int else bet*2
             winnings = 0
             betLow = -bet if betHigh else 0
             while betHigh:
