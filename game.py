@@ -1,4 +1,4 @@
-from firepup650 import clear, randint, sql, e, menu, gp, gh, cur, flushPrint, rint
+from firepup650 import clear, randint, sql, e, menu, gp, gh, cur, flushPrint, randint
 import random as r
 from fkeycapture import get, getnum, getchars
 import os, time, sys, re
@@ -78,6 +78,8 @@ else:
                 "studs": 20,
                 "debug": False,
                 "o": 0,  # I have no clue what this is supposed to be, doesn't seem to be used in the original doc?
+                "racScore": 0,
+                "richScore": 0,
             },
         )
         print("Account created successfully!")
@@ -100,11 +102,12 @@ while 1:
             "Rare Parts Shop": 5,
             "Energy Tank Shop": 6,
             "Resturant": 7,
+            "Fix my save data": 8,
             "[DEBUG]": "D",
             "Exit": "E",
         },
         "What would you like to do?",
-    )  # TODO: Put shops in their own menu
+    )
     clear()
     match go:
         case 1:
@@ -117,9 +120,12 @@ while 1:
   All-time Gains:   {uData["studsGained"]}
  Vehicles:          {uData["vehicles"]}
  House Level:       {uData["houseLevel"]}
- Energy Tanks:      {uData["energyTanks"]}"""
+ Energy Tanks:      {uData["energyTanks"]}
+ Misc:
+  Raccoon Score:    {uData["racScore"]}
+  Rich:             {uData["richScore"]}"""
             )
-            if uData["debug"]:
+            if uData["debug"] or uData["permissionLevel"] >= 50:
                 print(
                     f"""Debug Stats:
  Bebug bit:         {uData["debug"]}
@@ -130,16 +136,12 @@ while 1:
             get()
         case 2:
             print("Calculating avaliable bets, this shouldn't take long...")
-            bets = {
-                str(i): i for i in range(5, min(uData["studs"], 50000000), 5)
-            }  # TODO: optimze this somehow? idk man it's just really slow as-is. (Specifically when someone... abuses the current system)
+            bets = {str(i): i for i in range(5, min(uData["studs"], 50000000), 5)}
             bets["Exit"] = "E"
             bet = menu(bets, "How many studs would you like to bet?")
-            betHigh = (
-                0 if type(bet) != int else bet * 2
-            )  # TODO: Even out win-loose odds, probably in favor of loosing. This is gambling after all.
+            betHigh = 0 if type(bet) != int else bet
             winnings = 0
-            betLow = -bet if betHigh else 0
+            betLow = -2 * bet if betHigh else 0
             while betHigh:
                 winnings = randint(betLow, betHigh)
                 if multipleOf(winnings):
@@ -175,20 +177,55 @@ while 1:
             sleep(1)
         case 6:
             price1 = 10 + (5 * uData["energyTanks"])
-            price5 = (
-                5 * price1
-            )  # TODO: Cacluate these properly, this price is inheritly incorrect
-            price10 = 2 * price5  # TODO: See above
+            price5 = 0
+            for i in range(5):
+                price5 += 10 + (5 * (uData["energyTanks"] + i))
+                print(price5)
+            price10 = 0
+            for i in range(10):
+                price10 += 10 + (5 * (uData["energyTanks"] + i))
             count = menu(
                 {
                     f"1 ({price1} studs)": 1,
-                    "5 ({price5} studs)": 5,
-                    "10 ({price10} studs)": 10,
+                    f"5 ({price5} studs)": 5,
+                    f"10 ({price10} studs)": 10,
+                    "Exit": "E",
                 },
                 "How many energy tanks do you want?",
             )
-            print("TODO: Energy Tank Shop Functionality")
-            sleep(1)
+            match count:
+                case 1:
+                    if price1 <= uData["studs"]:
+                        uData["studs"] -= price1
+                        uData["studsLost"] += price1
+                        uData["energyTanks"] += 1
+                        print("You bought a single energy tank!")
+                    else:
+                        print("You're too poor.")
+                    sleep(2)
+                case 5:
+                    if price5 <= uData["studs"]:
+                        uData["studs"] -= price5
+                        uData["studsLost"] += price5
+                        uData["energyTanks"] += 5
+                        print("You bought 5 energy tanks!")
+                    else:
+                        print("You're too poor.")
+                    sleep(2)
+                case 10:
+                    if price10 <= uData["studs"]:
+                        uData["studs"] -= price10
+                        uData["studsLost"] += price10
+                        uData["energyTanks"] += 10
+                        print("You bought 10 energy tanks!")
+                    else:
+                        print("You're too poor.")
+                    sleep(2)
+                case "E":
+                    pass
+                case _:
+                    print("Firepup forgot to add a menu option, smh.")
+                    sleep(2)
         case 7:
             sel = menu(
                 {
@@ -196,7 +233,7 @@ while 1:
                     "Drink (10 studs)": 2,
                     "Box of Tacos (20 studs)": 3,
                     "Box of doughnuts (50 studs)": 4,
-                    "Trash (What are you, a raccon? We're not supposed to sell this...) (200 studs)": 5,
+                    "Trash (What are you, a raccoon? We're not even supposed to sell this...) (200 studs)": 5,
                     "Money (Excuse me?) (500 studs)": 6,
                     "Oh actually I don't want to eat anything I just want to waste money (1000 studs)": 7,
                     "Pure gold pizza (5000 studs)": 8,
@@ -213,29 +250,29 @@ while 1:
             thing, price, message, weird = ("Nothing", 0, "You bought nothing", True)
             match sel:
                 case 1:
-                    thing, price, message, weird = ("pizza", 5, "delicious!", False)
+                    thing, price, message, weird = ("a pizza", 5, "delicious!", False)
                 case 2:
-                    match rint(0, 9):
+                    match randint(0, 9):
                         case 0:
-                            thing = "can of strawberry fanta"
+                            thing = "a can of strawberry fanta"
                         case 1:
-                            thing = "can of liquid death"
+                            thing = "a can of liquid death"
                         case 2:
-                            thing = "can of water"
+                            thing = "a can of water"
                         case 3:
-                            thing = "can of generic soda"
+                            thing = "a can of generic soda"
                         case 4:
-                            thing = 'can of "fresh spring" water'
+                            thing = 'a can of "fresh spring" water'
                         case 5:
-                            thing = "paper cup of tap water"
+                            thing = "a paper cup of tap water"
                         case 6:
-                            thing = "can of gasoline"
+                            thing = "a can of motor oil"
                         case 7:
-                            thing = "can of rehyderated water"
+                            thing = "a can of rehyderated water"
                         case 8:
-                            thing = "can of blueberry"
+                            thing = "a can of blueberry"
                         case 9:
-                            thing = "can of rain water"
+                            thing = "a can of rain water"
                     price, message, weird = (
                         10,
                         "tastes just like you remember it!",
@@ -243,21 +280,21 @@ while 1:
                     )
                 case 3:
                     thing, price, message, weird = (
-                        "box of tacos",
+                        "a box of tacos",
                         20,
                         "there was a good amount of variety in that!",
                         False,
                     )
                 case 4:
                     thing, price, message, weird = (
-                        "box of doughnuts",
+                        "a box of doughnuts",
                         50,
                         "you can tell you're gonna reget all that sugar later.",
                         False,
                     )
                 case 5:
                     thing, price, message, weird = (
-                        "",
+                        "  trash",
                         200,
                         (
                             "You... eat the trash? (+1 raccoon score)"
@@ -269,31 +306,124 @@ while 1:
                     uData["racScore"] += 1
                 case 6:
                     thing, price, message, weird = (
-                        "",
+                        "  money",
                         500,
                         "You literally just eat money. Disgusting.",
                         True,
                     )
                 case 7:
                     thing, price, message, weird = (
-                        "",
+                        'a "tip"',
                         1000,
                         'You just give the cashier 1000 studs as a "tip". (+1 rich)',
                         True,
                     )
                     uData["richScore"] += 1
                 case 8:
-                    thing, price, message, weird = ("", 5000, "You add the golden pizza to your home. You can't eat it after all. (+1 rich)", True)
+                    thing, price, message, weird = (
+                        "a golden pizza",
+                        5000,
+                        "You add the golden pizza to your home. You can't eat it after all. (+1 rich)",
+                        True,
+                    )
                     uData["richScore"] += 1
                 case 9:
-                    thing, price, message, weird = ("", 10000, "You chug the liquid gold. You are in severe pain for at least 20 minutes. (+1 rich)", True)
+                    thing, price, message, weird = (
+                        "liquid gold",
+                        10000,
+                        "You chug the liquid gold. You are in severe pain for at least 20 minutes. (+1 rich)",
+                        True,
+                    )
                     uData["richScore"] += 1
                 case 10:
-                    thing, price, message, weird = ("", 20000, "You add the golden tacos to your home. The box was too poor for them. (+1 rich)", True)
+                    thing, price, message, weird = (
+                        "golden tacos",
+                        20000,
+                        "You add the golden tacos to your home. The box was too poor for them. (+1 rich)",
+                        True,
+                    )
                     uData["richScore"] += 1
                 case 11:
-                    thing, price, message, weird = ("", 50000, "You add the golden doughtnuts to your home. Very sophisticated! (+1 rich)", True)
-            sleep(1)
+                    thing, price, message, weird = (
+                        "golden doughnuts",
+                        50000,
+                        "You add the golden doughtnuts to your home. Very sophisticated! (+1 rich)",
+                        True,
+                    )
+                    uData["richScore"] += 1
+                case 12:
+                    thing, price, message, weird = (
+                        "golden trash",
+                        200000,
+                        (
+                            "You... eat... GOLDEN TRASH. What is worng with you? (+1 rich, +1 raccoon)"
+                            if uData["racScore"] < 10
+                            else "You eagerly consume the golden trash pile! (+1 rich, +1 raccoon)"
+                        ),
+                        True,
+                    )
+                    uData["richScore"] += 1
+                    uData["racScore"] += 1
+                case 13:
+                    thing, price, message, weird = (
+                        "5 cubic meters of gold",
+                        500000,
+                        "You EAT 5 cubic meters of gold. I don't even know how you managed that. (+5 rich)",
+                        True,
+                    )
+                    uData["richScore"] += 5
+                case 14:
+                    thing, price, message, weird = (
+                        'a hefty "tip"',
+                        1000000,
+                        'You "tip" the cashier a million studs. That\'s just not a tip man. (+5 rich)',
+                        True,
+                    )
+                case _:
+                    print("Firepup forgot to add a menu option, smh.")
+                    sleep(5)
+            if price <= uData["studs"]:
+                uData["studs"] -= price
+                uData["studsLost"] += price
+                if not weird:
+                    print(
+                        f"You {'eat' if sel!=2 else 'drink'} your {thing[2:]}... {message}"
+                    )
+                else:
+                    print(message)
+            else:
+                print(f"You're too poor to buy {thing} right now.")
+            sleep(2)
+        case 8:
+            migrations = {
+                "permissionLevel": 10,
+                "logins": 0,
+                "vehicles": [],
+                "houseLevel": 0,
+                "energyTanks": 0,
+                "studsGained": 0,
+                "studsLost": 0,
+                "highestStuds": 20,
+                "studs": 20,
+                "debug": False,
+                "o": 0,
+                "racScore": 0,
+                "richScore": 0,
+            }
+            fixed = False
+            for key in migrations:
+                if key not in uData:
+                    fixed = True
+                    print(
+                        f'Found missing save data key "{key}"! Resetting to default value...'
+                    )
+                    uData[key] = migrations[key]
+            print(
+                "Your save data has been fixed!"
+                if fixed
+                else "There was nothing I could find that was wrong with your save data!"
+            )
+            sleep(2)
         case "E":
             exit(0)
         case "D":
@@ -329,6 +459,8 @@ while 1:
                         uData["logins"] = 0
                         uData["houseLevel"] = 0
                         uData["o"] = 0
+                        uData["racScore"] = 0
+                        uData["richScore"] = 0
                         print("User data has been reset.")
                     case "E":
                         print("SLEEP 5")
