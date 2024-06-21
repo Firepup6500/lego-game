@@ -1,4 +1,4 @@
-from firepup650 import clear, randint, sql, e, menu, gp, gh, cur, flushPrint
+from firepup650 import clear, randint, sql, e, menu, gp, gh, cur, flushPrint, rint
 import random as r
 from fkeycapture import get, getnum, getchars
 import os, time, sys, re
@@ -8,8 +8,10 @@ db = sql("dev-database.db")
 
 alphanum = list("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")
 
+
 def multipleOf(num: int, mult: int = 5) -> bool:
-    return num%mult == 0
+    return num % mult == 0
+
 
 cur.hide()
 clear()
@@ -27,7 +29,10 @@ print("Loaded successfully")
 print("Starting...")
 sleep(2)
 cur.show()
-log = menu({"Yes": 1, "No": 0, "Exit": "E"}, "Welcome to the city!\nDo you have an existing account?")
+log = menu(
+    {"Yes": 1, "No": 0, "Exit": "E"},
+    "Welcome to the city!\nDo you have an existing account?",
+)
 clear()
 un = ""
 if log == "E":
@@ -72,7 +77,7 @@ else:
                 "highestStuds": 20,
                 "studs": 20,
                 "debug": False,
-                "o": 0, # I have no clue what this is supposed to be, doesn't seem to be used in the original doc?
+                "o": 0,  # I have no clue what this is supposed to be, doesn't seem to be used in the original doc?
             },
         )
         print("Account created successfully!")
@@ -86,11 +91,25 @@ else:
     print(f"Welcome back to Loge City {un}.")
 sleep(2)
 while 1:
-    go = menu({"Stats": 1, "Gamble": 2, "Research": 3, "Vehicle Shop": 4, "Rare Parts Shop": 5, "Energy Tank Shop": 6, "Resturant": 7, "[DEBUG]": "D", "Exit": "E"}, "What would you like to do?") # TODO: Put shops in their own menu
+    go = menu(
+        {
+            "Stats": 1,
+            "Gamble": 2,
+            "Research": 3,
+            "Vehicle Shop": 4,
+            "Rare Parts Shop": 5,
+            "Energy Tank Shop": 6,
+            "Resturant": 7,
+            "[DEBUG]": "D",
+            "Exit": "E",
+        },
+        "What would you like to do?",
+    )  # TODO: Put shops in their own menu
     clear()
     match go:
         case 1:
-            print(f"""Stats:
+            print(
+                f"""Stats:
  Studs:
   Current:          {uData["studs"]}
   All-time Highest: {uData["highestStuds"]}
@@ -98,20 +117,27 @@ while 1:
   All-time Gains:   {uData["studsGained"]}
  Vehicles:          {uData["vehicles"]}
  House Level:       {uData["houseLevel"]}
- Energy Tanks:      {uData["energyTanks"]}""")
+ Energy Tanks:      {uData["energyTanks"]}"""
+            )
             if uData["debug"]:
-                print(f"""Debug Stats:
+                print(
+                    f"""Debug Stats:
  Bebug bit:         {uData["debug"]}
  Permission Level:  {uData["permissionLevel"]}
- Idk what o is:     {uData["o"]}""")
+ Idk what o is:     {uData["o"]}"""
+                )
             print("Press any key to exit")
             get()
         case 2:
             print("Calculating avaliable bets, this shouldn't take long...")
-            bets = {str(i): i for i in range(5, min(uData["studs"], 50000000), 5)}
+            bets = {
+                str(i): i for i in range(5, min(uData["studs"], 50000000), 5)
+            }  # TODO: optimze this somehow? idk man it's just really slow as-is. (Specifically when someone... abuses the current system)
             bets["Exit"] = "E"
             bet = menu(bets, "How many studs would you like to bet?")
-            betHigh = 0 if type(bet) != int else bet*2
+            betHigh = (
+                0 if type(bet) != int else bet * 2
+            )  # TODO: Even out win-loose odds, probably in favor of loosing. This is gambling after all.
             winnings = 0
             betLow = -bet if betHigh else 0
             while betHigh:
@@ -149,19 +175,138 @@ while 1:
             sleep(1)
         case 6:
             price1 = 10 + (5 * uData["energyTanks"])
-            price5 = 5 * price1
-            price10 = 2 * price5
-            count = menu({f"1 ({price1} studs)": 1, "5 ({price5} studs)": 5, "10 ({price10} studs)": 10}, "How many energy tanks do you want?")
+            price5 = (
+                5 * price1
+            )  # TODO: Cacluate these properly, this price is inheritly incorrect
+            price10 = 2 * price5  # TODO: See above
+            count = menu(
+                {
+                    f"1 ({price1} studs)": 1,
+                    "5 ({price5} studs)": 5,
+                    "10 ({price10} studs)": 10,
+                },
+                "How many energy tanks do you want?",
+            )
             print("TODO: Energy Tank Shop Functionality")
             sleep(1)
         case 7:
-            print("TODO: Resturant")
+            sel = menu(
+                {
+                    "Pizza (5 studs)": 1,
+                    "Drink (10 studs)": 2,
+                    "Box of Tacos (20 studs)": 3,
+                    "Box of doughnuts (50 studs)": 4,
+                    "Trash (What are you, a raccon? We're not supposed to sell this...) (200 studs)": 5,
+                    "Money (Excuse me?) (500 studs)": 6,
+                    "Oh actually I don't want to eat anything I just want to waste money (1000 studs)": 7,
+                    "Pure gold pizza (5000 studs)": 8,
+                    "Liquid Gold (10000 studs)": 9,
+                    "Box of golden tacos (20000 studs)": 10,
+                    "Box of golden doughnuts (50000 studs)": 11,
+                    "Golden trash (I... why do we even sell this.) (200000 studs)": 12,
+                    "5 cubic meters of gold (...You know there's better uses of your money right?) (500000 studs)": 13,
+                    "I REALLY want to waste money (1 million studs)": 14,
+                    "Exit": 0,
+                },
+                "What would you like to order?",
+            )
+            thing, price, message, weird = ("Nothing", 0, "You bought nothing", True)
+            match sel:
+                case 1:
+                    thing, price, message, weird = ("pizza", 5, "delicious!", False)
+                case 2:
+                    match rint(0, 9):
+                        case 0:
+                            thing = "can of strawberry fanta"
+                        case 1:
+                            thing = "can of liquid death"
+                        case 2:
+                            thing = "can of water"
+                        case 3:
+                            thing = "can of generic soda"
+                        case 4:
+                            thing = 'can of "fresh spring" water'
+                        case 5:
+                            thing = "paper cup of tap water"
+                        case 6:
+                            thing = "can of gasoline"
+                        case 7:
+                            thing = "can of rehyderated water"
+                        case 8:
+                            thing = "can of blueberry"
+                        case 9:
+                            thing = "can of rain water"
+                    price, message, weird = (
+                        10,
+                        "tastes just like you remember it!",
+                        False,
+                    )
+                case 3:
+                    thing, price, message, weird = (
+                        "box of tacos",
+                        20,
+                        "there was a good amount of variety in that!",
+                        False,
+                    )
+                case 4:
+                    thing, price, message, weird = (
+                        "box of doughnuts",
+                        50,
+                        "you can tell you're gonna reget all that sugar later.",
+                        False,
+                    )
+                case 5:
+                    thing, price, message, weird = (
+                        "",
+                        200,
+                        (
+                            "You... eat the trash? (+1 raccoon score)"
+                            if uData["racScore"] < 10
+                            else "You eagerly consume the trash pile! (+1 raccoon score)"
+                        ),
+                        True,
+                    )
+                    uData["racScore"] += 1
+                case 6:
+                    thing, price, message, weird = (
+                        "",
+                        500,
+                        "You literally just eat money. Disgusting.",
+                        True,
+                    )
+                case 7:
+                    thing, price, message, weird = (
+                        "",
+                        1000,
+                        'You just give the cashier 1000 studs as a "tip". (+1 rich)',
+                        True,
+                    )
+                    uData["richScore"] += 1
+                case 8:
+                    thing, price, message, weird = ("", 5000, "You add the golden pizza to your home. You can't eat it after all. (+1 rich)", True)
+                    uData["richScore"] += 1
+                case 9:
+                    thing, price, message, weird = ("", 10000, "You chug the liquid gold. You are in severe pain for at least 20 minutes. (+1 rich)", True)
+                    uData["richScore"] += 1
+                case 10:
+                    thing, price, message, weird = ("", 20000, "You add the golden tacos to your home. The box was too poor for them. (+1 rich)", True)
+                    uData["richScore"] += 1
+                case 11:
+                    thing, price, message, weird = ("", 50000, "You add the golden doughtnuts to your home. Very sophisticated! (+1 rich)", True)
             sleep(1)
         case "E":
             exit(0)
         case "D":
             if uData["debug"]:
-                deb = menu({"Dump User Data": 1, "Reset Studs": 2, "Full data reset": 3, "Exit": "E"}, "[DEBUG MENU]")
+                deb = menu(
+                    {
+                        "Dump User Data": 1,
+                        "Reset Studs": 2,
+                        "Full data reset": 3,
+                        "Exit": "E",
+                    },
+                    "[DEBUG MENU]",
+                )
                 match deb:
                     case 1:
                         print("User Data dump: {")
@@ -188,7 +333,9 @@ while 1:
                     case "E":
                         print("SLEEP 5")
                     case _:
-                        print("Firepup forgot to implement a debug menu option\nSLEEP 10")
+                        print(
+                            "Firepup forgot to implement a debug menu option\nSLEEP 10"
+                        )
                         sleep(5)
                 sleep(5)
             else:
@@ -200,4 +347,6 @@ while 1:
     clear()
     if uData["studs"] > uData["highestStuds"]:
         uData["highestStuds"] = uData["studs"]
-    db.set(un, uData) # Update user data after each loop so it actually saves changes to the data
+    db.set(
+        un, uData
+    )  # Update user data after each loop so it actually saves changes to the data
