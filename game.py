@@ -170,7 +170,28 @@ while 1:
             print("TODO: Research Menu")
             sleep(1)
         case 4:
-            print("TODO: Vehicle Shop")
+            sel = menu(
+                {
+                    "A bike (20 studs)": 20,
+                    "A 4-wheeler (50 studs)": 50,
+                    "An old rusty little car (100 studs)": 100,
+                    "A car (200 studs)": 200,
+                    "A minivan (500 studs)": 500,
+                    "A van (750 studs)": 750,
+                    "A truck (1k studs)": 1000,
+                    "A food truck (2k studs)": 2000,
+                    "A semi-truck (5k studs)": 5000,
+                    "A hover bike (10k studs)": 10000,
+                    "A hover car (20k studs)": 20000,
+                    "A hover truck (50k studs)": 50000,
+                    "A hover semi-truck (100k studs)": 100000,
+                    "A pod racer (500k studs)": 500000,
+                    "A rocketship (1m studs)": 1000000,
+                    "A spaceship (5m studs)": 5000000,
+                    "A teleporter (10m studs)": 10000000,
+                },
+                "Welcome to the Vehicle Shop, please make a selection",
+            )
             sleep(1)
         case 5:
             print("TODO: Rare Parts Shop")
@@ -201,7 +222,7 @@ while 1:
                         uData["energyTanks"] += 1
                         print("You bought a single energy tank!")
                     else:
-                        print("You're too poor.")
+                        print("You're too poor to buy a single energy tank.")
                     sleep(2)
                 case 5:
                     if price5 <= uData["studs"]:
@@ -210,7 +231,7 @@ while 1:
                         uData["energyTanks"] += 5
                         print("You bought 5 energy tanks!")
                     else:
-                        print("You're too poor.")
+                        print("You're too poor to buy 5 energy tanks.")
                     sleep(2)
                 case 10:
                     if price10 <= uData["studs"]:
@@ -219,7 +240,7 @@ while 1:
                         uData["energyTanks"] += 10
                         print("You bought 10 energy tanks!")
                     else:
-                        print("You're too poor.")
+                        print("You're too poor to buy 10 energy tanks.")
                     sleep(2)
                 case "E":
                     pass
