@@ -188,10 +188,115 @@ while 1:
                     "A pod racer (500k studs)": 500000,
                     "A rocketship (1m studs)": 1000000,
                     "A spaceship (5m studs)": 5000000,
-                    "A teleporter (10m studs)": 10000000,
+                    "A spaceship with a hyper drive (10m studs)": 10000000,
+                    "A yacht (50m studs)": 50000000,
+                    "A space yacht (100m studs)": 100000000,
+                    "A teleporter (1b studs)": 1000000000,
+                    "Exit": "E",
                 },
                 "Welcome to the Vehicle Shop, please make a selection",
             )
+            match sel:
+                case 20:  # 1
+                    if 20 <= uData["studs"] and "bike" not in uData["vehicles"]:
+                        uData["vehicles"].append("bike")
+                        uData["studs"] -= 20
+                        uData["studsLost"] += 20
+                        print("You purchased a bike!")
+                    elif "bike" not in uData["vehicles"]:
+                        print("Sorry, you already have a bike!")
+                    else:
+                        print("You're too poor to buy a bike.")
+                case 50:  # 2
+                    if 20 <= uData["studs"] and "bike" not in uData["vehicles"]:
+                        uData["vehicles"].append("bike")
+                        uData["studs"] -= 20
+                        uData["studsLost"] += 20
+                        print("You purchased a bike!")
+                    elif "bike" not in uData["vehicles"]:
+                        print("Sorry, you already have a bike!")
+                    else:
+                        print("You're too poor to buy a bike.")
+                case 20:  # 3
+                    if 20 <= uData["studs"] and "bike" not in uData["vehicles"]:
+                        uData["vehicles"].append("bike")
+                        uData["studs"] -= 20
+                        uData["studsLost"] += 20
+                        print("You purchased a bike!")
+                    elif "bike" not in uData["vehicles"]:
+                        print("Sorry, you already have a bike!")
+                    else:
+                        print("You're too poor to buy a bike.")
+                case 20:  # 4
+                    if 20 <= uData["studs"] and "bike" not in uData["vehicles"]:
+                        uData["vehicles"].append("bike")
+                        uData["studs"] -= 20
+                        uData["studsLost"] += 20
+                        print("You purchased a bike!")
+                    elif "bike" not in uData["vehicles"]:
+                        print("Sorry, you already have a bike!")
+                    else:
+                        print("You're too poor to buy a bike.")
+                case 20:  # 5
+                    if 20 <= uData["studs"] and "bike" not in uData["vehicles"]:
+                        uData["vehicles"].append("bike")
+                        uData["studs"] -= 20
+                        uData["studsLost"] += 20
+                        print("You purchased a bike!")
+                    elif "bike" not in uData["vehicles"]:
+                        print("Sorry, you already have a bike!")
+                    else:
+                        print("You're too poor to buy a bike.")
+                case 20:  # 6
+                    if 20 <= uData["studs"] and "bike" not in uData["vehicles"]:
+                        uData["vehicles"].append("bike")
+                        uData["studs"] -= 20
+                        uData["studsLost"] += 20
+                        print("You purchased a bike!")
+                    elif "bike" not in uData["vehicles"]:
+                        print("Sorry, you already have a bike!")
+                    else:
+                        print("You're too poor to buy a bike.")
+                case 20:  # 7
+                    if 20 <= uData["studs"] and "bike" not in uData["vehicles"]:
+                        uData["vehicles"].append("bike")
+                        uData["studs"] -= 20
+                        uData["studsLost"] += 20
+                        print("You purchased a bike!")
+                    elif "bike" not in uData["vehicles"]:
+                        print("Sorry, you already have a bike!")
+                    else:
+                        print("You're too poor to buy a bike.")
+                case 20:  # 8
+                    if 20 <= uData["studs"] and "bike" not in uData["vehicles"]:
+                        uData["vehicles"].append("bike")
+                        uData["studs"] -= 20
+                        uData["studsLost"] += 20
+                        print("You purchased a bike!")
+                    elif "bike" not in uData["vehicles"]:
+                        print("Sorry, you already have a bike!")
+                    else:
+                        print("You're too poor to buy a bike.")
+                case 20:  # 9
+                    if 20 <= uData["studs"] and "bike" not in uData["vehicles"]:
+                        uData["vehicles"].append("bike")
+                        uData["studs"] -= 20
+                        uData["studsLost"] += 20
+                        print("You purchased a bike!")
+                    elif "bike" not in uData["vehicles"]:
+                        print("Sorry, you already have a bike!")
+                    else:
+                        print("You're too poor to buy a bike.")
+                case 20:  # 10
+                    if 20 <= uData["studs"] and "bike" not in uData["vehicles"]:
+                        uData["vehicles"].append("bike")
+                        uData["studs"] -= 20
+                        uData["studsLost"] += 20
+                        print("You purchased a bike!")
+                    elif "bike" not in uData["vehicles"]:
+                        print("Sorry, you already have a bike!")
+                    else:
+                        print("You're too poor to buy a bike.")
             sleep(1)
         case 5:
             print("TODO: Rare Parts Shop")
