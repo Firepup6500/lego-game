@@ -13,6 +13,11 @@ def multipleOf(num: int, mult: int = 5) -> bool:
     return num % mult == 0
 
 
+# Function from https://stackoverflow.com/a/2556252, merged with https://stackoverflow.com/a/59082116
+def rreplace(s: str, old: str, new: str, occurrence: int) -> str:
+    return new.join(s.rsplit(old, occurence))
+
+
 cur.hide()
 clear()
 print("Loading Loge City v 0.0.1...")
@@ -118,7 +123,7 @@ while 1:
   All-time Highest: {uData["highestStuds"]}
   All-time Losses:  {uData["studsLost"]}
   All-time Gains:   {uData["studsGained"]}
- Vehicles:          {uData["vehicles"]}
+ Vehicles:          {', '.join(uData["vehicles"])}
  House Level:       {uData["houseLevel"]}
  Energy Tanks:      {uData["energyTanks"]}
  Misc:
@@ -138,6 +143,7 @@ while 1:
             print("Calculating avaliable bets, this shouldn't take long...")
             bets = {str(i): i for i in range(5, min(uData["studs"], 50000000), 5)}
             bets["Exit"] = "E"
+            bets["5"] = 5  # Bugfix: menu crashes if you have 0 studs
             bet = menu(bets, "How many studs would you like to bet?")
             betHigh = 0 if type(bet) != int else bet
             winnings = 0
@@ -196,204 +202,234 @@ while 1:
                 },
                 "Welcome to the Vehicle Shop, please make a selection",
             )
-            match sel:
-                case 20:  # 1
+            match sel:  # Bugfix: Accidentally inverted the check for owning a vehicle
+                case 20:
                     if 20 <= uData["studs"] and "bike" not in uData["vehicles"]:
                         uData["vehicles"].append("bike")
                         uData["studs"] -= 20
                         uData["studsLost"] += 20
                         print("You purchased a bike!")
-                    elif "bike" not in uData["vehicles"]:
+                    elif "bike" in uData["vehicles"]:
                         print("Sorry, you already have a bike!")
                     else:
                         print("You're too poor to buy a bike.")
-                case 50:  # 2
+                case 50:
                     if 50 <= uData["studs"] and "4-wheeler" not in uData["vehicles"]:
                         uData["vehicles"].append("4-wheeler")
                         uData["studs"] -= 50
                         uData["studsLost"] += 50
                         print("You purchased a 4-wheeler!")
-                    elif "4-wheeler" not in uData["vehicles"]:
+                    elif "4-wheeler" in uData["vehicles"]:
                         print("Sorry, you already have a 4-wheeler!")
                     else:
                         print("You're too poor to buy a 4-wheeler.")
-                case 100:  # 3
-                    if 20 <= uData["studs"] and "old rusty car" not in uData["vehicles"]:
+                case 100:
+                    if (
+                        20 <= uData["studs"]
+                        and "old rusty car" not in uData["vehicles"]
+                    ):
                         uData["vehicles"].append("old rusty car")
                         uData["studs"] -= 100
                         uData["studsLost"] += 100
                         print("You purchased an old rusty car!")
-                    elif "old rusty car" not in uData["vehicles"]:
+                    elif "old rusty car" in uData["vehicles"]:
                         print("Sorry, you already have an old rusty car!")
                     else:
                         print("You're too poor to buy an old rusty car.")
-                case 200:  # 4
+                case 200:
                     if 200 <= uData["studs"] and "car" not in uData["vehicles"]:
                         uData["vehicles"].append("car")
                         uData["studs"] -= 200
                         uData["studsLost"] += 200
                         print("You purchased a car!")
-                    elif "car" not in uData["vehicles"]:
+                    elif "car" in uData["vehicles"]:
                         print("Sorry, you already have a car!")
                     else:
                         print("You're too poor to buy a car.")
-                case 500:  # 5
+                case 500:
                     if 500 <= uData["studs"] and "minivan" not in uData["vehicles"]:
                         uData["vehicles"].append("minivan")
                         uData["studs"] -= 500
                         uData["studsLost"] += 500
                         print("You purchased a minivan!")
-                    elif "minivan" not in uData["vehicles"]:
+                    elif "minivan" in uData["vehicles"]:
                         print("Sorry, you already have a minivan!")
                     else:
                         print("You're too poor to buy a minivan.")
-                case 750:  # 6
+                case 750:
                     if 750 <= uData["studs"] and "van" not in uData["vehicles"]:
                         uData["vehicles"].append("van")
                         uData["studs"] -= 750
                         uData["studsLost"] += 750
                         print("You purchased a van!")
-                    elif "van" not in uData["vehicles"]:
+                    elif "van" in uData["vehicles"]:
                         print("Sorry, you already have a van!")
                     else:
                         print("You're too poor to buy a van.")
-                case 1000:  # 7
+                case 1000:
                     if 1000 <= uData["studs"] and "truck" not in uData["vehicles"]:
                         uData["vehicles"].append("truck")
                         uData["studs"] -= 1000
                         uData["studsLost"] += 1000
                         print("You purchased a truck!")
-                    elif "truck" not in uData["vehicles"]:
+                    elif "truck" in uData["vehicles"]:
                         print("Sorry, you already have a truck!")
                     else:
                         print("You're too poor to buy a truck.")
-                case 2000:  # 8
+                case 2000:
                     if 2000 <= uData["studs"] and "food truck" not in uData["vehicles"]:
                         uData["vehicles"].append("food truck")
                         uData["studs"] -= 2000
                         uData["studsLost"] += 2000
                         print("You purchased a food truck!")
-                    elif "food truck" not in uData["vehicles"]:
+                    elif "food truck" in uData["vehicles"]:
                         print("Sorry, you already have a food truck!")
                     else:
                         print("You're too poor to buy a food truck.")
-                case 5000:  # 9
+                case 5000:
                     if 5000 <= uData["studs"] and "semi-truck" not in uData["vehicles"]:
                         uData["vehicles"].append("semi-truck")
                         uData["studs"] -= 5000
                         uData["studsLost"] += 5000
                         print("You purchased a semi-truck!")
-                    elif "semi-truck" not in uData["vehicles"]:
+                    elif "semi-truck" in uData["vehicles"]:
                         print("Sorry, you already have a semi-truck!")
                     else:
                         print("You're too poor to buy a semi-truck.")
-                case 10000:  # 10
-                    if 10000 <= uData["studs"] and "hover bike" not in uData["vehicles"]:
+                case 10000:
+                    if (
+                        10000 <= uData["studs"]
+                        and "hover bike" not in uData["vehicles"]
+                    ):
                         uData["vehicles"].append("hover bike")
                         uData["studs"] -= 10000
                         uData["studsLost"] += 10000
                         print("You purchased a hover bike!")
-                    elif "hover bike" not in uData["vehicles"]:
+                    elif "hover bike" in uData["vehicles"]:
                         print("Sorry, you already have a hover bike!")
                     else:
                         print("You're too poor to buy a hover bike.")
-                case 20000:  # 11
+                case 20000:
                     if 20 <= uData["studs"] and "hover car" not in uData["vehicles"]:
                         uData["vehicles"].append("hover car")
                         uData["studs"] -= 20000
                         uData["studsLost"] += 20000
                         print("You purchased a hover car!")
-                    elif "hover car" not in uData["vehicles"]:
+                    elif "hover car" in uData["vehicles"]:
                         print("Sorry, you already have a hover car!")
                     else:
                         print("You're too poor to buy a hover car.")
-                case 50000:  # 12
-                    if 50000 <= uData["studs"] and "hover truck" not in uData["vehicles"]:
+                case 50000:
+                    if (
+                        50000 <= uData["studs"]
+                        and "hover truck" not in uData["vehicles"]
+                    ):
                         uData["vehicles"].append("hover truck")
                         uData["studs"] -= 50000
                         uData["studsLost"] += 50000
                         print("You purchased a hover truck!")
-                    elif "hover truck" not in uData["vehicles"]:
+                    elif "hover truck" in uData["vehicles"]:
                         print("Sorry, you already have a hover truck!")
                     else:
                         print("You're too poor to buy a hover truck.")
-                case 100000:  # 13
-                    if 100000 <= uData["studs"] and "hover semi-truck" not in uData["vehicles"]:
+                case 100000:
+                    if (
+                        100000 <= uData["studs"]
+                        and "hover semi-truck" not in uData["vehicles"]
+                    ):
                         uData["vehicles"].append("hover semi-truck")
                         uData["studs"] -= 100000
                         uData["studsLost"] += 100000
                         print("You purchased a hover semi-truck!")
-                    elif "hover semi-truck" not in uData["vehicles"]:
+                    elif "hover semi-truck" in uData["vehicles"]:
                         print("Sorry, you already have a hover semi-truck!")
                     else:
                         print("You're too poor to buy a hover semi-truck.")
-                case 500000:  # 14
-                    if 500000 <= uData["studs"] and "pod racer" not in uData["vehicles"]:
+                case 500000:
+                    if (
+                        500000 <= uData["studs"]
+                        and "pod racer" not in uData["vehicles"]
+                    ):
                         uData["vehicles"].append("pod racer")
                         uData["studs"] -= 500000
                         uData["studsLost"] += 500000
                         print("You purchased a pod racer!")
-                    elif "pod racer" not in uData["vehicles"]:
+                    elif "pod racer" in uData["vehicles"]:
                         print("Sorry, you already have a pod racer!")
                     else:
                         print("You're too poor to buy a pod racer.")
-                case 1000000:  # 15
-                    if 1000000 <= uData["studs"] and "rocketship" not in uData["vehicles"]:
+                case 1000000:
+                    if (
+                        1000000 <= uData["studs"]
+                        and "rocketship" not in uData["vehicles"]
+                    ):
                         uData["vehicles"].append("rocketship")
                         uData["studs"] -= 2000000
                         uData["studsLost"] += 1000000
                         print("You purchased a rocketship!")
-                    elif "rocketship" not in uData["vehicles"]:
+                    elif "rocketship" in uData["vehicles"]:
                         print("Sorry, you already have a rocketship!")
                     else:
                         print("You're too poor to buy a rocketship.")
-                case 5000000:  # 16
-                    if 5000000 <= uData["studs"] and "spaceship" not in uData["vehicles"]:
+                case 5000000:
+                    if (
+                        5000000 <= uData["studs"]
+                        and "spaceship" not in uData["vehicles"]
+                    ):
                         uData["vehicles"].append("spaceship")
                         uData["studs"] -= 5000000
                         uData["studsLost"] += 5000000
                         print("You purchased a spaceship!")
-                    elif "spaceship" not in uData["vehicles"]:
+                    elif "spaceship" in uData["vehicles"]:
                         print("Sorry, you already have a spaceship!")
                     else:
                         print("You're too poor to buy a spaceship.")
-                case 10000000:  # 17
-                    if 10000000 <= uData["studs"] and "spaceship with a hyperdrive" not in uData["vehicles"]:
+                case 10000000:
+                    if (
+                        10000000 <= uData["studs"]
+                        and "spaceship with a hyperdrive" not in uData["vehicles"]
+                    ):
                         uData["vehicles"].append("spaceship with a hyperdrive")
                         uData["studs"] -= 10000000
                         uData["studsLost"] += 10000000
                         print("You purchased a spaceship with a hyperdrive!")
-                    elif "spaceship with a hyperdrive" not in uData["vehicles"]:
+                    elif "spaceship with a hyperdrive" in uData["vehicles"]:
                         print("Sorry, you already have a spaceship with a hyperdrive!")
                     else:
                         print("You're too poor to buy a spaceship with a hyperdrive.")
-                case 50000000:  # 18
+                case 50000000:
                     if 50000000 <= uData["studs"] and "yacht" not in uData["vehicles"]:
                         uData["vehicles"].append("yacht")
                         uData["studs"] -= 50000000
                         uData["studsLost"] += 50000000
                         print("You purchased a yacht!")
-                    elif "yacht" not in uData["vehicles"]:
+                    elif "yacht" in uData["vehicles"]:
                         print("Sorry, you already have a yacht!")
                     else:
                         print("You're too poor to buy a yacht.")
-                case 100000000:  # 19
-                    if 100000000 <= uData["studs"] and "space yacht" not in uData["vehicles"]:
+                case 100000000:
+                    if (
+                        100000000 <= uData["studs"]
+                        and "space yacht" not in uData["vehicles"]
+                    ):
                         uData["vehicles"].append("space yacht")
                         uData["studs"] -= 100000000
                         uData["studsLost"] += 100000000
                         print("You purchased a space yacht!")
-                    elif "space yacht" not in uData["vehicles"]:
+                    elif "space yacht" in uData["vehicles"]:
                         print("Sorry, you already have a space yacht!")
                     else:
                         print("You're too poor to buy a space yacht.")
-                case 1000000000:  # 20
-                    if 1000000000 <= uData["studs"] and "teleporter" not in uData["vehicles"]:
+                case 1000000000:
+                    if (
+                        1000000000 <= uData["studs"]
+                        and "teleporter" not in uData["vehicles"]
+                    ):
                         uData["vehicles"].append("teleporter")
                         uData["studs"] -= 1000000000
                         uData["studsLost"] += 1000000000
                         print("You purchased a teleporter!")
-                    elif "teleporter" not in uData["vehicles"]:
+                    elif "teleporter" in uData["vehicles"]:
                         print("Sorry, you already have a teleporter!")
                     else:
                         print("You're too poor to buy a teleporter.")
@@ -404,8 +440,36 @@ while 1:
                     sleep(2)
             sleep(2)
         case 5:
-            print("TODO: Rare Parts Shop")
-            sleep(1)
+            # Each item in this menu grants 1 more rich than the previous item
+            sel = menu(
+                {
+                    "Gold bar (250 studs)": 250,
+                    "Golden cup (500 studs)": 500,
+                    "Golden plate (1k studs)": 1000,
+                    "Golden table (5k studs)": 5000,
+                    "Crystal (250k studs)": 250000,
+                    "Crystal cup (500k studs)": 500000,
+                    "Crystal plate (1m studs)": 1000000,
+                    "Crystal table (5m studs)": 5000000,
+                    "Double studded 1x1 plate (10m studs)": 10000000,
+                    "Double studded 2x2 plate (50m studs)": 50000000,
+                    "Hinge joint (100m studs)": 100000000,
+                },
+                "What rare items do you want to buy today?",
+            )
+            match sel:
+                case 250:
+                case 500:
+                case 1000:
+                case 5000:
+                case 250000:
+                case 500000:
+                case 1000000:
+                case 5000000:
+                case 1000000:
+                case 5000000:
+                case 1000000:
+            sleep(2)
         case 6:
             price1 = 10 + (5 * uData["energyTanks"])
             price5 = 0
@@ -610,10 +674,12 @@ while 1:
                         'You "tip" the cashier a million studs. That\'s just not a tip man. (+5 rich)',
                         True,
                     )
+                case "E":
+                    pass
                 case _:
                     print("Firepup forgot to add a menu option, smh.")
                     sleep(5)
-            if price <= uData["studs"]:
+            if price > 0 and price <= uData["studs"]:
                 uData["studs"] -= price
                 uData["studsLost"] += price
                 if not weird:
@@ -622,7 +688,7 @@ while 1:
                     )
                 else:
                     print(message)
-            else:
+            elif price > 0:
                 print(f"You're too poor to buy {thing} right now.")
             sleep(2)
         case 8:
