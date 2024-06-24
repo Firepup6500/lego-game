@@ -15,7 +15,7 @@ def multipleOf(num: int, mult: int = 5) -> bool:
 
 # Function from https://stackoverflow.com/a/2556252, merged with https://stackoverflow.com/a/59082116
 def rreplace(s: str, old: str, new: str, occurrence: int) -> str:
-    return new.join(s.rsplit(old, occurence))
+    return new.join(s.rsplit(old, occurrence))
 
 
 cur.hide()
@@ -40,6 +40,7 @@ log = menu(
 )
 clear()
 un = ""
+uData = None
 if log == "E":
     exit(0)
 if log:
@@ -88,15 +89,15 @@ else:
                 "rare": {},
             },
         )
+        uData = db.get(un)
         print("Account created successfully!")
 sleep(1)
 clear()
-uData = db.get(un)
 uData["logins"] += 1
 if uData["logins"] == 1:
     print(f"Welcome {un}, to Loge City!")
 else:
-    print(f"Welcome back to Loge City {un}.")
+    print(f"Welcome back to Loge City {un}, we hope you are enjoying your stay.")
 sleep(2)
 while 1:
     go = menu(
@@ -118,12 +119,50 @@ while 1:
     match go:
         case 1:
             rares = ""
-            for item in uData["rare"]:
+            rOrder = [
+                "gold bar",
+                "golden cup",
+                "golden plate",
+                "golden table",
+                "crystal",
+                "crystal cup",
+                "crystal plate",
+                "crystal table",
+                "double studded 1x1 plate",
+                "double studded 2x2 plate",
+                "hinge joint",
+                "vault door",
+            ]
+            rCopy = list(uData["rare"].keys())
+            rCopy.sort(key=lambda x: rOrder.index(x))
+            for item in rCopy:
                 if rares:
                     rares = f"{rares}, {uData['rare'][item]} {item}{'s' if uData['rare'][item] > 1 else ''}"
                 else:
                     rares = f"{uData['rare'][item]} {item}{'s' if uData['rare'][item] > 1 else ''}"
-            rares = rreplace(rares, ", ", ", and", 1)
+            rares = rreplace(rares, ", ", ", and ", 1)
+            vOrder = [
+                "bike",
+                "4-wheeler",
+                "old rusty car",
+                "car",
+                "minivan",
+                "van",
+                "truck",
+                "food truck",
+                "semi-truck",
+                "hover bike",
+                "hover car",
+                "hover semi-tuck",
+                "pod racer",
+                "rocketship",
+                "spaceship",
+                "spaceship with a hyperdrive",
+                "yacht",
+                "space yacht",
+                "teleporter",
+            ]
+            uData["vehicles"].sort(key=lambda x: vOrder.index(x))
             print(
                 f"""Stats:
  Studs:
@@ -131,12 +170,12 @@ while 1:
   All-time Highest: {uData["highestStuds"]}
   All-time Losses:  {uData["studsLost"]}
   All-time Gains:   {uData["studsGained"]}
- Vehicles:          {rreplace(", ".join(uData["vehicles"]), ", ", ", and", 1) if uData["vehicles"] else "None"}
+ Vehicles:          {rreplace(", ".join(uData["vehicles"]), ", ", ", and ", 1) if uData["vehicles"] else "None"}
  Rare Items:        {rares if rares else "None"}
  House Level:       {uData["houseLevel"]}
  Energy Tanks:      {uData["energyTanks"]}
- Misc:
-  Raccoon Score:    {uData["racScore"]}
+ Misc Scores:
+  Raccoon:          {uData["racScore"]}
   Rich:             {uData["richScore"]}"""
             )
             if uData["debug"] or uData["permissionLevel"] >= 50:
@@ -306,10 +345,7 @@ while 1:
                     else:
                         print("You're too poor to buy a semi-truck.")
                 case 10000:
-                    if (
-                        sel <= uData["studs"]
-                        and "hover bike" not in uData["vehicles"]
-                    ):
+                    if sel <= uData["studs"] and "hover bike" not in uData["vehicles"]:
                         uData["vehicles"].append("hover bike")
                         uData["studs"] -= sel
                         uData["studsLost"] += sel
@@ -329,10 +365,7 @@ while 1:
                     else:
                         print("You're too poor to buy a hover car.")
                 case 50000:
-                    if (
-                        sel <= uData["studs"]
-                        and "hover truck" not in uData["vehicles"]
-                    ):
+                    if sel <= uData["studs"] and "hover truck" not in uData["vehicles"]:
                         uData["vehicles"].append("hover truck")
                         uData["studs"] -= sel
                         uData["studsLost"] += sel
@@ -355,10 +388,7 @@ while 1:
                     else:
                         print("You're too poor to buy a hover semi-truck.")
                 case 500000:
-                    if (
-                        sel <= uData["studs"]
-                        and "pod racer" not in uData["vehicles"]
-                    ):
+                    if sel <= uData["studs"] and "pod racer" not in uData["vehicles"]:
                         uData["vehicles"].append("pod racer")
                         uData["studs"] -= sel
                         uData["studsLost"] += sel
@@ -368,10 +398,7 @@ while 1:
                     else:
                         print("You're too poor to buy a pod racer.")
                 case 1000000:
-                    if (
-                        sel <= uData["studs"]
-                        and "rocketship" not in uData["vehicles"]
-                    ):
+                    if sel <= uData["studs"] and "rocketship" not in uData["vehicles"]:
                         uData["vehicles"].append("rocketship")
                         uData["studs"] -= sel
                         uData["studsLost"] += sel
@@ -381,10 +408,7 @@ while 1:
                     else:
                         print("You're too poor to buy a rocketship.")
                 case 5000000:
-                    if (
-                        sel <= uData["studs"]
-                        and "spaceship" not in uData["vehicles"]
-                    ):
+                    if sel <= uData["studs"] and "spaceship" not in uData["vehicles"]:
                         uData["vehicles"].append("spaceship")
                         uData["studs"] -= sel
                         uData["studsLost"] += sel
@@ -417,10 +441,7 @@ while 1:
                     else:
                         print("You're too poor to buy a yacht.")
                 case 100000000:
-                    if (
-                        sel <= uData["studs"]
-                        and "space yacht" not in uData["vehicles"]
-                    ):
+                    if sel <= uData["studs"] and "space yacht" not in uData["vehicles"]:
                         uData["vehicles"].append("space yacht")
                         uData["studs"] -= sel
                         uData["studsLost"] += sel
@@ -430,10 +451,7 @@ while 1:
                     else:
                         print("You're too poor to buy a space yacht.")
                 case 1000000000:
-                    if (
-                        sel <= uData["studs"]
-                        and "teleporter" not in uData["vehicles"]
-                    ):
+                    if sel <= uData["studs"] and "teleporter" not in uData["vehicles"]:
                         uData["vehicles"].append("teleporter")
                         uData["studs"] -= sel
                         uData["studsLost"] += sel
@@ -449,7 +467,6 @@ while 1:
                     sleep(2)
             sleep(2)
         case 5:
-            # Each item in this menu grants 1 more rich than the previous item
             sel = menu(
                 {
                     "Gold bar (250 studs)": 250,
@@ -473,144 +490,144 @@ while 1:
                     if sel <= uData["studs"]:
                         uData["studs"] -= sel
                         uData["studsLost"] += sel
-                        uData["rich"] += 1
+                        uData["richScore"] += 1
                         if "gold bar" in uData["rare"]:
                             uData["rare"]["gold bar"] += 1
                         else:
                             uData["rare"]["gold bar"] = 1
-                        print("You bought a gold bar!")
+                        print("You bought a gold bar! (+1 rich)")
                     else:
                         print("You're too poor to buy a gold bar.")
                 case 500:
                     if sel <= uData["studs"]:
                         uData["studs"] -= sel
                         uData["studsLost"] += sel
-                        uData["rich"] += 2
+                        uData["richScore"] += 2
                         if "golden cup" in uData["rare"]:
                             uData["rare"]["golden cup"] += 1
                         else:
                             uData["rare"]["golden cup"] = 1
-                        print("You bought a golden cup!")
+                        print("You bought a golden cup! (+2 rich)")
                     else:
                         print("You're too poor to buy a golden cup.")
                 case 1000:
                     if sel <= uData["studs"]:
                         uData["studs"] -= sel
                         uData["studsLost"] += sel
-                        uData["rich"] += 3
+                        uData["richScore"] += 5
                         if "golden plate" in uData["rare"]:
                             uData["rare"]["golden plate"] += 1
                         else:
                             uData["rare"]["golden plate"] = 1
-                        print("You bought a golden plate!")
+                        print("You bought a golden plate! (+5 rich)")
                     else:
                         print("You're too poor to buy a golden plate.")
                 case 5000:
                     if sel <= uData["studs"]:
                         uData["studs"] -= sel
                         uData["studsLost"] += sel
-                        uData["rich"] += 4
+                        uData["richScore"] += 10
                         if "golden table" in uData["rare"]:
                             uData["rare"]["golden table"] += 1
                         else:
                             uData["rare"]["golden table"] = 1
-                        print("You bought a golden table!")
+                        print("You bought a golden table! (+10 rich)")
                     else:
                         print("You're too poor to buy a golden table.")
                 case 250000:
                     if sel <= uData["studs"]:
                         uData["studs"] -= sel
                         uData["studsLost"] += sel
-                        uData["rich"] += 5
+                        uData["richScore"] += 20
                         if "crystal" in uData["rare"]:
                             uData["rare"]["crystal"] += 1
                         else:
                             uData["rare"]["crystal"] = 1
-                        print("You bought a crystal!")
+                        print("You bought a crystal! (+20 rich)")
                     else:
                         print("You're too poor to buy a crystal.")
                 case 500000:
                     if sel <= uData["studs"]:
                         uData["studs"] -= sel
                         uData["studsLost"] += sel
-                        uData["rich"] += 6
+                        uData["richScore"] += 25
                         if "crystal cup" in uData["rare"]:
                             uData["rare"]["crystal cup"] += 1
                         else:
                             uData["rare"]["crystal cup"] = 1
-                        print("You bought a crystal cup!")
+                        print("You bought a crystal cup! (+25 rich)")
                     else:
                         print("You're too poor to buy a crystal cup.")
                 case 1000000:
                     if sel <= uData["studs"]:
                         uData["studs"] -= sel
                         uData["studsLost"] += sel
-                        uData["rich"] += 7
+                        uData["richScore"] += 50
                         if "crystal plate" in uData["rare"]:
                             uData["rare"]["crystal plate"] += 1
                         else:
                             uData["rare"]["crystal plate"] = 1
-                        print("You bought a crystal plate!")
+                        print("You bought a crystal plate! (+50 rich)")
                     else:
                         print("You're too poor to buy a crystal plate.")
                 case 5000000:
                     if sel <= uData["studs"]:
                         uData["studs"] -= sel
                         uData["studsLost"] += sel
-                        uData["rich"] += 8
+                        uData["richScore"] += 75
                         if "crystal table" in uData["rare"]:
                             uData["rare"]["crystal table"] += 1
                         else:
                             uData["rare"]["crystal table"] = 1
-                        print("You bought a crystal table!")
+                        print("You bought a crystal table! (+75 rich)")
                     else:
                         print("You're too poor to buy a crystal table.")
                 case 10000000:
                     if sel <= uData["studs"]:
                         uData["studs"] -= sel
                         uData["studsLost"] += sel
-                        uData["rich"] += 9
+                        uData["richScore"] += 100
                         if "double studded 1x1 plate" in uData["rare"]:
                             uData["rare"]["double studded 1x1 plate"] += 1
                         else:
                             uData["rare"]["double studded 1x1 plate"] = 1
-                        print("You bought a double studded 1x1 plate!")
+                        print("You bought a double studded 1x1 plate! (+100 rich)")
                     else:
                         print("You're too poor to buy a double studded 1x1 plate.")
                 case 50000000:
                     if sel <= uData["studs"]:
                         uData["studs"] -= sel
                         uData["studsLost"] += sel
-                        uData["rich"] += 10
+                        uData["richScore"] += 125
                         if "double studded 2x2 plate" in uData["rare"]:
                             uData["rare"]["double studded 2x2 plate"] += 1
                         else:
                             uData["rare"]["double studded 2x2 plate"] = 1
-                        print("You bought a double studded 2x2 plate!")
+                        print("You bought a double studded 2x2 plate! (+125 rich)")
                     else:
                         print("You're too poor to buy a double studded 2x2 plate.")
                 case 100000000:
                     if sel <= uData["studs"]:
                         uData["studs"] -= sel
                         uData["studsLost"] += sel
-                        uData["rich"] += 11
+                        uData["richScore"] += 150
                         if "hinge joint" in uData["rare"]:
                             uData["rare"]["hinge joint"] += 1
                         else:
                             uData["rare"]["hinge joint"] = 1
-                        print("You bought a hinge joint!")
+                        print("You bought a hinge joint! (+150 rich)")
                     else:
                         print("You're too poor to buy a hinge joint.")
                 case 500000000:
                     if sel <= uData["studs"]:
                         uData["studs"] -= sel
                         uData["studsLost"] += sel
-                        uData["rich"] += 12
+                        uData["richScore"] += 200
                         if "vault door" in uData["rare"]:
                             uData["rare"]["vault door"] += 1
                         else:
                             uData["rare"]["vault door"] = 1
-                        print("You bought a vault door!")
+                        print("You bought a vault door! (+200 rich)")
                     else:
                         print("You're too poor to buy a vault door.")
                 case "E":
@@ -775,54 +792,55 @@ while 1:
                     thing, price, message, weird = (
                         "liquid gold",
                         10000,
-                        "You chug the liquid gold. You are in severe pain for at least 20 minutes. (+1 rich)",
+                        "You chug the liquid gold. You are in severe pain for at least 20 minutes. (+2 rich)",
                         True,
                     )
-                    uData["richScore"] += 1
+                    uData["richScore"] += 2
                 case 10:
                     thing, price, message, weird = (
                         "golden tacos",
                         20000,
-                        "You add the golden tacos to your home. The box was too poor for them. (+1 rich)",
+                        "You add the golden tacos to your home. The box was too poor for them. (+5 rich)",
                         True,
                     )
-                    uData["richScore"] += 1
+                    uData["richScore"] += 5
                 case 11:
                     thing, price, message, weird = (
                         "golden doughnuts",
                         50000,
-                        "You add the golden doughtnuts to your home. Very sophisticated! (+1 rich)",
+                        "You add the golden doughtnuts to your home. Very sophisticated! (+15 rich)",
                         True,
                     )
-                    uData["richScore"] += 1
+                    uData["richScore"] += 15
                 case 12:
                     thing, price, message, weird = (
                         "golden trash",
                         200000,
                         (
-                            "You... eat... GOLDEN TRASH. What is worng with you? (+1 rich, +1 raccoon)"
-                            if uData["racScore"] < 10
-                            else "You eagerly consume the golden trash pile! (+1 rich, +1 raccoon)"
+                            "You... eat... GOLDEN TRASH. What is worng with you? (+20 rich, +5 raccoon)"
+                            if uData["racScore"] < 20
+                            else "You eagerly consume the golden trash pile! (+20 rich, +5 raccoon)"
                         ),
                         True,
                     )
-                    uData["richScore"] += 1
-                    uData["racScore"] += 1
+                    uData["richScore"] += 20
+                    uData["racScore"] += 5
                 case 13:
                     thing, price, message, weird = (
                         "5 cubic meters of gold",
                         500000,
-                        "You EAT 5 cubic meters of gold. I don't even know how you managed that. (+5 rich)",
+                        "You EAT 5 cubic meters of gold. I don't even know how you managed that. (+25 rich)",
                         True,
                     )
-                    uData["richScore"] += 5
+                    uData["richScore"] += 25
                 case 14:
                     thing, price, message, weird = (
                         'a hefty "tip"',
                         1000000,
-                        'You "tip" the cashier a million studs. That\'s just not a tip man. (+5 rich)',
+                        'You "tip" the cashier a million studs. That\'s just not a tip man. (+30 rich)',
                         True,
                     )
+                    uData["richScore"] += 30  # Bugfix: Missing rich score increment
                 case "E":
                     pass
                 case _:
@@ -855,7 +873,7 @@ while 1:
                 "o": 0,
                 "racScore": 0,
                 "richScore": 0,
-                "rare": {}
+                "rare": {},
             }
             fixed = False
             for key in migrations:
@@ -908,6 +926,7 @@ while 1:
                         uData["o"] = 0
                         uData["racScore"] = 0
                         uData["richScore"] = 0
+                        uData["rare"] = {}
                         print("User data has been reset.")
                     case "E":
                         print("SLEEP 5")
@@ -919,9 +938,11 @@ while 1:
                 sleep(5)
             else:
                 print("Operation not permitted")
-                sleep(5)
+                sleep(2)
         case _:
-            print("Invalid option, this should have been impossible.")
+            print(
+                "Invalid option, this should have been impossible. Feel free to complain to firepup about this missing MAIN MENU option being missing."
+            )
             sleep(60)
     clear()
     if uData["studs"] > uData["highestStuds"]:
