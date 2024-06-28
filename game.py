@@ -87,6 +87,7 @@ else:
                 "racScore": 0,
                 "richScore": 0,
                 "rare": {},
+                "upgrades": {},
             },
         )
         uData = db.get(un)
@@ -100,11 +101,12 @@ else:
     print(f"Welcome back to Loge City {un}, we hope you are enjoying your stay.")
 sleep(2)
 while 1:
+    studsAtTop = uData["studs"]
     go = menu(
         {
             "Stats": 1,
             "Gamble": 2,
-            "Research": 3,
+            "Upgrades": 3,
             "Vehicle Shop": 4,
             "Rare Parts Shop": 5,
             "Energy Tank Shop": 6,
@@ -221,8 +223,53 @@ while 1:
                     print("You don't have enough studs to bet that much.")
                 sleep(5)
         case 3:
-            print("TODO: Research Menu")
-            sleep(1)
+            prices = {
+                "studX": 2000000 * pow(10, uData["upgrades"].get("studX", 1) - 1),
+                "houseL": 200 + pow(53 * uData[houseLevel], uData["houseLevel"]),
+                "luck": 500 * pow(10, uData["upgrades"].get("luck", 0) * 2),
+            }
+            sel = menu(
+                {
+                    f"Stud multiplier {uData['upgrades'].get('studX', 1)}x -> {uData['upgrades'].get('studX', 1) + 1}x ({prices['studX']} studs)": "studX",
+                    f"House level {uData['houseLevel']} -> {uData['houseLevel'] + 1} ({prices['houseL']} studs)": "houseL",
+                    f"Luck (Affects betting) {uData['upgrades'].get('luck', 0)}% -> {uData['upgrades'].get('luck', 0) + 1}% ({prices['luck']} studs)": "luck",
+                    "Exit": "E",
+                },
+                "What do you want to upgrade?",
+            )
+            match sel:
+                case "studX":
+                    if uData["studs"] >= price[sel]:
+                        uData["studs"] -= price[sel]
+                        uData["studsLost"] += price[sel]
+                        uData["upgrades"]["studX"] = (
+                            uData["upgrades"].get("studX", 1) + 1
+                        )
+                        print(
+                            "You've upgraded your stud multipler to {uData['upgrades']['studX']}x!"
+                        )
+                case "houseL":
+                    if uData["studs"] >= price[sel]:
+                        uData["studs"] -= price[sel]
+                        uData["studsLost"] += price[sel]
+                        uData["houseLevel"] += 1
+                        print(
+                            "You've upgraded your house to  level {uData['houseLevel']}!"
+                        )
+                case "luck":
+                    if uData["studs"] >= price[sel]:
+                        uData["studs"] -= price[sel]
+                        uData["studsLost"] += price[sel]
+                        uData["upgrades"]["luck"] = uData["upgrades"].get("luck", 0) + 1
+                        print(
+                            "You've upgraded your luck to {uData['upgrades']['luck']}%!"
+                        )
+                case "E":
+                    pass
+                case _:
+                    print("Firepup forgot to add a menu option, smh")
+                    sleep(2)
+            sleep(2)
         case 4:
             sel = menu(
                 {
@@ -874,6 +921,7 @@ while 1:
                 "racScore": 0,
                 "richScore": 0,
                 "rare": {},
+                "upgrades": {},
             }
             fixed = False
             for key in migrations:
@@ -945,6 +993,10 @@ while 1:
             )
             sleep(60)
     clear()
+    if uData["studs"] % 1:
+        uData["studs"] = round(uData["studs"])
+    while uData["studs"] % 5:
+        uData["studs"] -= 1
     if uData["studs"] > uData["highestStuds"]:
         uData["highestStuds"] = uData["studs"]
     db.set(
