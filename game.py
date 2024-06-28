@@ -20,7 +20,9 @@ def rreplace(s: str, old: str, new: str, occurrence: int) -> str:
 
 cur.hide()
 clear()
-print("Loading Loge City v 0.0.1...")
+print(
+    "Loading Loge City v 0.0.16..."
+)  # Finally remebered to bump this... I think v16 is right?
 sleep(1)
 flushPrint("Checking system compatibility...")
 sleep(1)
@@ -100,6 +102,7 @@ if uData["logins"] == 1:
 else:
     print(f"Welcome back to Loge City {un}, we hope you are enjoying your stay.")
 sleep(2)
+# LTOP - jump point for me
 while 1:
     studsAtTop = uData["studs"]
     go = menu(
@@ -178,7 +181,10 @@ while 1:
  Energy Tanks:      {uData["energyTanks"]}
  Misc Scores:
   Raccoon:          {uData["racScore"]}
-  Rich:             {uData["richScore"]}"""
+  Rich:             {uData["richScore"]}
+ Upgrades:
+  Luck:             {uData["upgrades"].get("luck", 0)}%
+  Stud Multipiler:  {uData["upgrades"].get("studX", 1)}x"""
             )
             if uData["debug"] or uData["permissionLevel"] >= 50:
                 print(
@@ -198,6 +204,8 @@ while 1:
             betHigh = 0 if type(bet) != int else bet
             winnings = 0
             betLow = -2 * bet if betHigh else 0
+            if betLow:
+                betLow = min(betLow + (uData["upgrades"].get("luck") * 5), 0)
             while betHigh:
                 winnings = randint(betLow, betHigh)
                 if multipleOf(winnings):
@@ -210,13 +218,10 @@ while 1:
                         print("You won nothing. (You kept your bet though)")
                     elif winnings == betLow:
                         print("You lost your bet!")
-                        uData["studsLost"] += abs(winnings)
                     elif winnings >= 0:
                         print(f"You won {winnings} studs!")
-                        uData["studsGained"] += winnings
                     elif winnings <= 0:
                         print(f"You lost {abs(winnings)} studs!")
-                        uData["studsLost"] += abs(winnings)
                     else:
                         print("This should be impossible. Cue the panic attacks.")
                 else:
@@ -224,13 +229,14 @@ while 1:
                 sleep(5)
         case 3:
             prices = {
-                "studX": 2000000 * pow(10, uData["upgrades"].get("studX", 1) - 1),
-                "houseL": 200 + pow(53 * uData[houseLevel], uData["houseLevel"]),
+                "studX": 2000000
+                * pow(10, (uData["upgrades"].get("studX", 1) * 10) - 10),
+                "houseL": 199 + pow(53 * uData["houseLevel"], uData["houseLevel"]),
                 "luck": 500 * pow(10, uData["upgrades"].get("luck", 0) * 2),
             }
             sel = menu(
                 {
-                    f"Stud multiplier {uData['upgrades'].get('studX', 1)}x -> {uData['upgrades'].get('studX', 1) + 1}x ({prices['studX']} studs)": "studX",
+                    f"Stud multiplier {uData['upgrades'].get('studX', 1)}x -> {uData['upgrades'].get('studX', 1) + 0.1}x ({prices['studX']} studs)": "studX",
                     f"House level {uData['houseLevel']} -> {uData['houseLevel'] + 1} ({prices['houseL']} studs)": "houseL",
                     f"Luck (Affects betting) {uData['upgrades'].get('luck', 0)}% -> {uData['upgrades'].get('luck', 0) + 1}% ({prices['luck']} studs)": "luck",
                     "Exit": "E",
@@ -239,30 +245,25 @@ while 1:
             )
             match sel:
                 case "studX":
-                    if uData["studs"] >= price[sel]:
-                        uData["studs"] -= price[sel]
-                        uData["studsLost"] += price[sel]
-                        uData["upgrades"]["studX"] = (
-                            uData["upgrades"].get("studX", 1) + 1
-                        )
+                    if uData["studs"] >= prices[sel]:
+                        uData["studs"] -= prices[sel]
+                        uData["upgrades"][sel] = uData["upgrades"].get(sel, 1) + 0.1
                         print(
-                            "You've upgraded your stud multipler to {uData['upgrades']['studX']}x!"
+                            f"You've upgraded your stud multipler to {uData['upgrades'][sel]}x!"
                         )
                 case "houseL":
-                    if uData["studs"] >= price[sel]:
-                        uData["studs"] -= price[sel]
-                        uData["studsLost"] += price[sel]
+                    if uData["studs"] >= prices[sel]:
+                        uData["studs"] -= prices[sel]
                         uData["houseLevel"] += 1
                         print(
-                            "You've upgraded your house to  level {uData['houseLevel']}!"
+                            f"You've upgraded your house to  level {uData['houseLevel']}!"
                         )
                 case "luck":
-                    if uData["studs"] >= price[sel]:
-                        uData["studs"] -= price[sel]
-                        uData["studsLost"] += price[sel]
-                        uData["upgrades"]["luck"] = uData["upgrades"].get("luck", 0) + 1
+                    if uData["studs"] >= prices[sel]:
+                        uData["studs"] -= prices[sel]
+                        uData["upgrades"][sel] = uData["upgrades"].get(sel, 0) + 1
                         print(
-                            "You've upgraded your luck to {uData['upgrades']['luck']}%!"
+                            f"You've upgraded your luck to {uData['upgrades'][sel]}%!"
                         )
                 case "E":
                     pass
@@ -302,7 +303,6 @@ while 1:
                     if sel <= uData["studs"] and "bike" not in uData["vehicles"]:
                         uData["vehicles"].append("bike")
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         print("You purchased a bike!")
                     elif "bike" in uData["vehicles"]:
                         print("Sorry, you already have a bike!")
@@ -312,7 +312,6 @@ while 1:
                     if sel <= uData["studs"] and "4-wheeler" not in uData["vehicles"]:
                         uData["vehicles"].append("4-wheeler")
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         print("You purchased a 4-wheeler!")
                     elif "4-wheeler" in uData["vehicles"]:
                         print("Sorry, you already have a 4-wheeler!")
@@ -325,7 +324,6 @@ while 1:
                     ):
                         uData["vehicles"].append("old rusty car")
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         print("You purchased an old rusty car!")
                     elif "old rusty car" in uData["vehicles"]:
                         print("Sorry, you already have an old rusty car!")
@@ -335,7 +333,6 @@ while 1:
                     if sel <= uData["studs"] and "car" not in uData["vehicles"]:
                         uData["vehicles"].append("car")
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         print("You purchased a car!")
                     elif "car" in uData["vehicles"]:
                         print("Sorry, you already have a car!")
@@ -345,7 +342,6 @@ while 1:
                     if sel <= uData["studs"] and "minivan" not in uData["vehicles"]:
                         uData["vehicles"].append("minivan")
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         print("You purchased a minivan!")
                     elif "minivan" in uData["vehicles"]:
                         print("Sorry, you already have a minivan!")
@@ -355,7 +351,6 @@ while 1:
                     if sel <= uData["studs"] and "van" not in uData["vehicles"]:
                         uData["vehicles"].append("van")
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         print("You purchased a van!")
                     elif "van" in uData["vehicles"]:
                         print("Sorry, you already have a van!")
@@ -365,7 +360,6 @@ while 1:
                     if sel <= uData["studs"] and "truck" not in uData["vehicles"]:
                         uData["vehicles"].append("truck")
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         print("You purchased a truck!")
                     elif "truck" in uData["vehicles"]:
                         print("Sorry, you already have a truck!")
@@ -375,7 +369,6 @@ while 1:
                     if sel <= uData["studs"] and "food truck" not in uData["vehicles"]:
                         uData["vehicles"].append("food truck")
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         print("You purchased a food truck!")
                     elif "food truck" in uData["vehicles"]:
                         print("Sorry, you already have a food truck!")
@@ -385,7 +378,6 @@ while 1:
                     if sel <= uData["studs"] and "semi-truck" not in uData["vehicles"]:
                         uData["vehicles"].append("semi-truck")
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         print("You purchased a semi-truck!")
                     elif "semi-truck" in uData["vehicles"]:
                         print("Sorry, you already have a semi-truck!")
@@ -395,7 +387,6 @@ while 1:
                     if sel <= uData["studs"] and "hover bike" not in uData["vehicles"]:
                         uData["vehicles"].append("hover bike")
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         print("You purchased a hover bike!")
                     elif "hover bike" in uData["vehicles"]:
                         print("Sorry, you already have a hover bike!")
@@ -405,7 +396,6 @@ while 1:
                     if sel <= uData["studs"] and "hover car" not in uData["vehicles"]:
                         uData["vehicles"].append("hover car")
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         print("You purchased a hover car!")
                     elif "hover car" in uData["vehicles"]:
                         print("Sorry, you already have a hover car!")
@@ -415,7 +405,6 @@ while 1:
                     if sel <= uData["studs"] and "hover truck" not in uData["vehicles"]:
                         uData["vehicles"].append("hover truck")
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         print("You purchased a hover truck!")
                     elif "hover truck" in uData["vehicles"]:
                         print("Sorry, you already have a hover truck!")
@@ -428,7 +417,6 @@ while 1:
                     ):
                         uData["vehicles"].append("hover semi-truck")
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         print("You purchased a hover semi-truck!")
                     elif "hover semi-truck" in uData["vehicles"]:
                         print("Sorry, you already have a hover semi-truck!")
@@ -438,7 +426,6 @@ while 1:
                     if sel <= uData["studs"] and "pod racer" not in uData["vehicles"]:
                         uData["vehicles"].append("pod racer")
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         print("You purchased a pod racer!")
                     elif "pod racer" in uData["vehicles"]:
                         print("Sorry, you already have a pod racer!")
@@ -448,7 +435,6 @@ while 1:
                     if sel <= uData["studs"] and "rocketship" not in uData["vehicles"]:
                         uData["vehicles"].append("rocketship")
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         print("You purchased a rocketship!")
                     elif "rocketship" in uData["vehicles"]:
                         print("Sorry, you already have a rocketship!")
@@ -458,7 +444,6 @@ while 1:
                     if sel <= uData["studs"] and "spaceship" not in uData["vehicles"]:
                         uData["vehicles"].append("spaceship")
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         print("You purchased a spaceship!")
                     elif "spaceship" in uData["vehicles"]:
                         print("Sorry, you already have a spaceship!")
@@ -471,7 +456,6 @@ while 1:
                     ):
                         uData["vehicles"].append("spaceship with a hyperdrive")
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         print("You purchased a spaceship with a hyperdrive!")
                     elif "spaceship with a hyperdrive" in uData["vehicles"]:
                         print("Sorry, you already have a spaceship with a hyperdrive!")
@@ -481,7 +465,6 @@ while 1:
                     if sel <= uData["studs"] and "yacht" not in uData["vehicles"]:
                         uData["vehicles"].append("yacht")
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         print("You purchased a yacht!")
                     elif "yacht" in uData["vehicles"]:
                         print("Sorry, you already have a yacht!")
@@ -491,7 +474,6 @@ while 1:
                     if sel <= uData["studs"] and "space yacht" not in uData["vehicles"]:
                         uData["vehicles"].append("space yacht")
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         print("You purchased a space yacht!")
                     elif "space yacht" in uData["vehicles"]:
                         print("Sorry, you already have a space yacht!")
@@ -501,7 +483,6 @@ while 1:
                     if sel <= uData["studs"] and "teleporter" not in uData["vehicles"]:
                         uData["vehicles"].append("teleporter")
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         print("You purchased a teleporter!")
                     elif "teleporter" in uData["vehicles"]:
                         print("Sorry, you already have a teleporter!")
@@ -536,7 +517,6 @@ while 1:
                 case 250:
                     if sel <= uData["studs"]:
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         uData["richScore"] += 1
                         if "gold bar" in uData["rare"]:
                             uData["rare"]["gold bar"] += 1
@@ -548,7 +528,6 @@ while 1:
                 case 500:
                     if sel <= uData["studs"]:
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         uData["richScore"] += 2
                         if "golden cup" in uData["rare"]:
                             uData["rare"]["golden cup"] += 1
@@ -560,7 +539,6 @@ while 1:
                 case 1000:
                     if sel <= uData["studs"]:
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         uData["richScore"] += 5
                         if "golden plate" in uData["rare"]:
                             uData["rare"]["golden plate"] += 1
@@ -572,7 +550,6 @@ while 1:
                 case 5000:
                     if sel <= uData["studs"]:
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         uData["richScore"] += 10
                         if "golden table" in uData["rare"]:
                             uData["rare"]["golden table"] += 1
@@ -584,7 +561,6 @@ while 1:
                 case 250000:
                     if sel <= uData["studs"]:
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         uData["richScore"] += 20
                         if "crystal" in uData["rare"]:
                             uData["rare"]["crystal"] += 1
@@ -596,7 +572,6 @@ while 1:
                 case 500000:
                     if sel <= uData["studs"]:
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         uData["richScore"] += 25
                         if "crystal cup" in uData["rare"]:
                             uData["rare"]["crystal cup"] += 1
@@ -608,7 +583,6 @@ while 1:
                 case 1000000:
                     if sel <= uData["studs"]:
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         uData["richScore"] += 50
                         if "crystal plate" in uData["rare"]:
                             uData["rare"]["crystal plate"] += 1
@@ -620,7 +594,6 @@ while 1:
                 case 5000000:
                     if sel <= uData["studs"]:
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         uData["richScore"] += 75
                         if "crystal table" in uData["rare"]:
                             uData["rare"]["crystal table"] += 1
@@ -632,7 +605,6 @@ while 1:
                 case 10000000:
                     if sel <= uData["studs"]:
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         uData["richScore"] += 100
                         if "double studded 1x1 plate" in uData["rare"]:
                             uData["rare"]["double studded 1x1 plate"] += 1
@@ -644,7 +616,6 @@ while 1:
                 case 50000000:
                     if sel <= uData["studs"]:
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         uData["richScore"] += 125
                         if "double studded 2x2 plate" in uData["rare"]:
                             uData["rare"]["double studded 2x2 plate"] += 1
@@ -656,7 +627,6 @@ while 1:
                 case 100000000:
                     if sel <= uData["studs"]:
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         uData["richScore"] += 150
                         if "hinge joint" in uData["rare"]:
                             uData["rare"]["hinge joint"] += 1
@@ -668,7 +638,6 @@ while 1:
                 case 500000000:
                     if sel <= uData["studs"]:
                         uData["studs"] -= sel
-                        uData["studsLost"] += sel
                         uData["richScore"] += 200
                         if "vault door" in uData["rare"]:
                             uData["rare"]["vault door"] += 1
@@ -705,7 +674,6 @@ while 1:
                 case 1:
                     if price1 <= uData["studs"]:
                         uData["studs"] -= price1
-                        uData["studsLost"] += price1
                         uData["energyTanks"] += 1
                         print("You bought a single energy tank!")
                     else:
@@ -714,7 +682,6 @@ while 1:
                 case 5:
                     if price5 <= uData["studs"]:
                         uData["studs"] -= price5
-                        uData["studsLost"] += price5
                         uData["energyTanks"] += 5
                         print("You bought 5 energy tanks!")
                     else:
@@ -723,7 +690,6 @@ while 1:
                 case 10:
                     if price10 <= uData["studs"]:
                         uData["studs"] -= price10
-                        uData["studsLost"] += price10
                         uData["energyTanks"] += 10
                         print("You bought 10 energy tanks!")
                     else:
@@ -755,7 +721,15 @@ while 1:
                 },
                 "What would you like to order?",
             )
-            thing, price, message, weird = ("Nothing", 0, "You bought nothing", True)
+            # Bugfix: rich and raccoon would always go up even if you failed to buy the item
+            thing, price, message, weird, rich, rac = (
+                "Nothing",
+                0,
+                "You bought nothing",
+                True,
+                0,
+                0,
+            )
             match sel:
                 case 1:
                     thing, price, message, weird = ("a pizza", 5, "delicious!", False)
@@ -781,7 +755,7 @@ while 1:
                             thing = "a can of blueberry"
                         case 9:
                             thing = "a can of rain water"
-                    price, message, weird = (
+                    price, message, Weird = (
                         10,
                         "tastes just like you remember it!",
                         False,
@@ -801,7 +775,8 @@ while 1:
                         False,
                     )
                 case 5:
-                    thing, price, message, weird = (
+                    # Bugfix here down: Don't redundantly set `weird` to `True` again
+                    thing, price, message, rac = (
                         "  trash",
                         200,
                         (
@@ -809,58 +784,51 @@ while 1:
                             if uData["racScore"] < 10
                             else "You eagerly consume the trash pile! (+1 raccoon score)"
                         ),
-                        True,
+                        1,
                     )
-                    uData["racScore"] += 1
                 case 6:
-                    thing, price, message, weird = (
+                    thing, price, message = (
                         "  money",
                         500,
                         "You literally just eat money. Disgusting.",
-                        True,
                     )
                 case 7:
-                    thing, price, message, weird = (
+                    thing, price, message, rich = (
                         'a "tip"',
                         1000,
                         'You just give the cashier 1000 studs as a "tip". (+1 rich)',
-                        True,
+                        1,
                     )
-                    uData["richScore"] += 1
                 case 8:
-                    thing, price, message, weird = (
+                    thing, price, message, rich = (
                         "a golden pizza",
                         5000,
                         "You add the golden pizza to your home. You can't eat it after all. (+1 rich)",
-                        True,
+                        1,
                     )
-                    uData["richScore"] += 1
                 case 9:
-                    thing, price, message, weird = (
+                    thing, price, message, rich = (
                         "liquid gold",
                         10000,
                         "You chug the liquid gold. You are in severe pain for at least 20 minutes. (+2 rich)",
-                        True,
+                        2,
                     )
-                    uData["richScore"] += 2
                 case 10:
-                    thing, price, message, weird = (
+                    thing, price, message, rich = (
                         "golden tacos",
                         20000,
                         "You add the golden tacos to your home. The box was too poor for them. (+5 rich)",
-                        True,
+                        5,
                     )
-                    uData["richScore"] += 5
                 case 11:
-                    thing, price, message, weird = (
+                    thing, price, message, rich = (
                         "golden doughnuts",
                         50000,
                         "You add the golden doughtnuts to your home. Very sophisticated! (+15 rich)",
-                        True,
+                        15,
                     )
-                    uData["richScore"] += 15
                 case 12:
-                    thing, price, message, weird = (
+                    thing, price, message, rich, rac = (
                         "golden trash",
                         200000,
                         (
@@ -868,26 +836,23 @@ while 1:
                             if uData["racScore"] < 20
                             else "You eagerly consume the golden trash pile! (+20 rich, +5 raccoon)"
                         ),
-                        True,
+                        20,
+                        5,
                     )
-                    uData["richScore"] += 20
-                    uData["racScore"] += 5
                 case 13:
-                    thing, price, message, weird = (
+                    thing, price, message, rich = (
                         "5 cubic meters of gold",
                         500000,
                         "You EAT 5 cubic meters of gold. I don't even know how you managed that. (+25 rich)",
-                        True,
+                        25,
                     )
-                    uData["richScore"] += 25
                 case 14:
-                    thing, price, message, weird = (
+                    thing, price, message, rich = (
                         'a hefty "tip"',
                         1000000,
                         'You "tip" the cashier a million studs. That\'s just not a tip man. (+30 rich)',
-                        True,
+                        30,
                     )
-                    uData["richScore"] += 30  # Bugfix: Missing rich score increment
                 case "E":
                     pass
                 case _:
@@ -895,7 +860,8 @@ while 1:
                     sleep(5)
             if price > 0 and price <= uData["studs"]:
                 uData["studs"] -= price
-                uData["studsLost"] += price
+                uData["richScore"] += rich
+                uData["racScore"] += rac
                 if not weird:
                     print(
                         f"You {'eat' if sel!=2 else 'drink'} your {thing[2:]}... {message}"
@@ -993,10 +959,25 @@ while 1:
             )
             sleep(60)
     clear()
+    # Apply stud multipliers to any earned money after the everything else runs
+    newStuds = studsAtTop - uData["studs"]
+    if newStuds > 0:
+        uData["studs"] += newStuds * uData["upgrades"].get("studX", 1)
+    # If we're gonna have weird stud multipliers, we've gotta round those back to standard increments, and normal rounding isn't enough, since I want the studs to be locked to increments of 5.
     if uData["studs"] % 1:
         uData["studs"] = round(uData["studs"])
-    while uData["studs"] % 5:
-        uData["studs"] -= 1
+    if uData["studs"] % 5:
+        if (uData["studs"] + (uData["studs"] % 5)) < (
+            uData["studs"] + (5 - (uData["studs"] % 5))
+        ):
+            uData["studs"] -= uData["studs"] % 5
+        else:
+            uData["studs"] += 5 - (uData["studs"] % 5)
+    studsDiff = studsAtTop - uData["studs"]
+    if studsAtTop > 0:
+        uData["studsGained"] += studsDiff
+    else:  # Yes, this could be caused if studsDiff is 0. However that's not a concern since it'll just subtract 0.
+        uData["studsLost"] -= studsDiff
     if uData["studs"] > uData["highestStuds"]:
         uData["highestStuds"] = uData["studs"]
     db.set(
